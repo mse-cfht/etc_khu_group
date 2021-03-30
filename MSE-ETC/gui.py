@@ -1,402 +1,372 @@
-"""
-Created on Jan 19, 2020
+"""This is the graphical user interface (GUI) module of MSE-ETC.
+This module defines the GUI of MSE-ETC.
 
-@Author: Tae-Geun Ji and Soojong PAK
+Modification Log
+2020.01.19 - First created by Tae-Geun Ji & Soojong Pak
+2020.02.25 - Updated by Taeeun Kim
+2020.03.24 - Updated by Tae-Geun Ji
 """
 
 from initial_values import *
-from functions import *
 from tkinter import *
 from tkinter import ttk
+import functions
+import interpolate
 import tkinter.font as font
-from interpolate import *
-import output
 
-class MainGUI(Frame):
+
+class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
+    """Define the components of GUI."""
 
     def __init__(self, master):
         super(MainGUI, self).__init__(master)
 
-        print('==========================================================================')
-        print('MSE Exposure Time Calculator')
-        print('Version = 0.1.2')
+        # ==== Size of Main Window
+        self.master.geometry("800x800")
+        self.master.resizable(False, False)
 
-        # Global Parameters
+        self.title_font = font.Font(family="Verdana", size=14)
+        self.font = font.Font(family="Verdana", size=11)
+
+        # ==== Settings for Title Window
+        self.title_window = PanedWindow(self.master, orient="vertical")
+        self.title_frame = LabelFrame(self.title_window)
+        self.title_window.add(self.title_frame)
+        self.title_window.place(x=0, y=0, width=800, height=135)
+
+        self.image_logo = PhotoImage(file="mse_logo.png")
+        self.label_logo = Label(self.title_window, image=self.image_logo)
+        self.label_logo.place(x=0, y=0)
+
+        # ==== Settings for Spectral Resolution Mode Window
+        self.res_window = PanedWindow(self.master, orient="vertical")
+        self.res_frame = LabelFrame(self.res_window, bg=c0, bd=0)
+        self.res_window.add(self.res_frame)
+        self.res_window.place(x=0, y=135, width=800, height=100)
+
+        self.res_label = Label(self.res_window, text="Resolution Mode Selection",
+                                      font=self.title_font, bg=c0, fg="white")
+        self.res_label.place(relx=0.5, rely=0.2, anchor=CENTER)
+
         self.resolution = StringVar()
+
+        self.res_combo = ttk.Combobox(self.res_window, width=12, state="readonly",
+                                             textvariable=self.resolution, font=self.font)
+        self.res_combo.place(relx=0.5, rely=0.6, anchor=CENTER)
+        self.res_combo['values'] = ('LR', 'MR', 'HR')
+        self.res_combo.current(0)
+
+        # ==== Settings for Calculate Method Window
+        self.mode_window = PanedWindow(self.master, orient="vertical")
+        self.mode_frame = LabelFrame(self.mode_window, bg=c1, bd=0)
+        self.mode_window.add(self.mode_frame)
+        self.mode_window.place(x=0, y=235, width=800, height=100)
+
+        self.mode_label = Label(self.mode_window, text="Calculation Mode Selection", font=self.title_font, bg=c1)
+        self.mode_label.place(relx=0.5, rely=0.2, anchor=CENTER)
+
         self.mode = StringVar()
         self.mode.set("S/N Calculation")
-        self.wave = StringVar()
-        # UI settings for panels
-        self.font_title = font.Font(family="Arial", size=14)
 
-        self.mainframe = PanedWindow(self.master, orient="vertical")
-        self.logo_frame = LabelFrame(self.mainframe, text="")
-        self.combo_frame = LabelFrame(self.mainframe, text="Resolution Mode Selection")
-        self.mode_frame = LabelFrame(self.mainframe, text="Calculation Mode Selection")
-        self.input_frame = LabelFrame(self.mainframe, text="User Input Parameters")
-        self.btn_frame = Frame(self.mainframe)
+        self.single_radio = Radiobutton(self.mode_frame, text="S/N Calculation", variable=self.mode,
+                                        value="S/N Calculation", font=self.font, bg=c1, command=self.ui_enable)
+        self.single_radio.place(relx=0.2, rely=0.6, anchor=CENTER)
 
-        self.mainframe.add(self.logo_frame)
-        self.mainframe.add(self.combo_frame)
-        self.mainframe.add(self.mode_frame)
-        self.mainframe.add(self.input_frame)
-        self.mainframe.add(self.btn_frame)
-        self.mainframe.grid(padx=10, pady=10)
+        self.single_radio = Radiobutton(self.mode_frame, text="S/N vs. Magnitude", variable=self.mode,
+                                        value="S/N vs. Magnitude", font=self.font, bg=c1, command=self.ui_enable)
+        self.single_radio.place(relx=0.5, rely=0.6, anchor=CENTER)
 
-        # UI settings for title
-        self.img = PhotoImage(file="mse_logo.png").subsample(6)
-        self.label_logo = Label(self.logo_frame, image=self.img)
-        self.label_logo.grid(row=0, column=0)
+        self.single_radio = Radiobutton(self.mode_frame, text="S/N vs. Wavelength", variable=self.mode,
+                                        value="S/N vs. Wavelength", font=self.font, bg=c1, command=self.ui_enable)
+        self.single_radio.place(relx=0.8, rely=0.6, anchor=CENTER)
 
-        self.label_title = Label(self.logo_frame, text="Exposure Time Calculator v0.1.2 (in development)",
-                                 font=self.font_title)
-        self.label_title.grid(row=1, column=0, padx=30, pady=5)
+        # ==== Settings for User Input Parameters Window
+        self.input_window = PanedWindow(self.master, orient="vertical")
+        self.input_frame = LabelFrame(self.input_window, bg=c2, bd=0)
+        self.input_window.add(self.input_frame)
+        self.input_window.place(x=0, y=335, width=800, height=400)
 
-        # UI settings for resolution selection panel
-        self.cmb_rmode = ttk.Combobox(self.combo_frame, width=13, state="readonly", textvariable=self.resolution)
-        self.cmb_rmode.grid(row=0, column=0, padx=30, pady=10)
-        self.cmb_rmode['values'] = ('LR', 'MR', 'HR')
-        self.cmb_rmode.current(0)
+        self.input_label = Label(self.input_window, text="User Input Parameters", font=self.title_font, bg=c2)
+        self.input_label.place(relx=0.5, rely=0.05, anchor=CENTER)
 
-        # UI settings for mode selection panel
-        self.radio_single = Radiobutton(self.mode_frame, text="S/N Calculation", variable=self.mode,
-                                        value="S/N Calculation", command=self.mode_select)
-        self.radio_single.grid(row=0, column=1, padx=30, pady=10, sticky=W)
+        # PWV
+        self.pwv_label = Label(self.input_frame, text="PWV [mm] = ", font=self.font, bg=c2)
+        self.pwv_label.place(x=190, y=50, anchor=E)
+        self.pwv_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                               textvariable=DoubleVar(value=ini_pwv), font=self.font)
+        self.pwv_entry.place(x=190, y=50, anchor=W)
 
-        self.radio_plot = Radiobutton(self.mode_frame, text="S/N vs. Magnitude", variable=self.mode,
-                                      value="S/N vs. Magnitude", command=self.mode_select)
-        self.radio_plot.grid(row=0, column=2, padx=60, pady=10)
+        # Exposure Time
+        self.exp_time_label = Label(self.input_frame, text="Exp. Time [sec] = ", font=self.font, bg=c2)
+        self.exp_time_label.place(x=190, y=80, anchor=E)
+        self.exp_time_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_exptime), font=self.font)
+        self.exp_time_entry.place(x=190, y=80, anchor=W)
 
-        self.radio_plot = Radiobutton(self.mode_frame, text="S/N vs. Wavelength", variable=self.mode,
-                                      value="S/N vs. Wavelength", command=self.mode_select)
-        self.radio_plot.grid(row=0, column=3, padx=10, pady=10)
+        # Number of Exposure
+        self.exp_num_label = Label(self.input_frame, text="Number of Exp. = ", font=self.font, bg=c2)
+        self.exp_num_label.place(x=190, y=110, anchor=E)
+        self.exp_num_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_expnumber), font=self.font)
+        self.exp_num_entry.place(x=190, y=110, anchor=W)
 
-        # UI settings for User Input Parameters panel
-        self.label_pwv = Label(self.input_frame, text="PWV [mm] =")
-        self.label_pwv.grid(row=0, column=0, padx=30, sticky=W)
-        self.edit_pwv = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_pwv))
-        self.edit_pwv.grid(row=0, column=0, padx=150, sticky=W)
+        # Target Magnitude (AB)
+        self.magnitude_label = Label(self.input_frame, text="Target Magnitude (AB):", font=self.font, bg=c2)
+        self.magnitude_label.place(x=20, y=170, anchor=W)
 
-        self.label_exptime = Label(self.input_frame, text="Exp. Time [sec]  =")
-        self.label_exptime.grid(row=1, column=0, padx=30, pady=5, sticky=W)
-        self.edit_exptime = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_exptime))
-        self.edit_exptime.grid(row=1, column=0, padx=150, sticky=W)
+        self.mag_blue_label = Label(self.input_frame, text="Blue", font=self.font, bg=c2)
+        self.mag_blue_label.place(x=20, y=200, anchor=W)
+        self.mag_green_label = Label(self.input_frame, text="Green", font=self.font, bg=c2)
+        self.mag_green_label.place(x=90, y=200, anchor=W)
+        self.mag_red_label = Label(self.input_frame, text="Red", font=self.font, bg=c2)
+        self.mag_red_label.place(x=160, y=200, anchor=W)
+        self.mag_nir_label = Label(self.input_frame, text="NIR", font=self.font, bg=c2)
+        self.mag_nir_label.place(x=230, y=200, anchor=W)
 
-        self.label_number = Label(self.input_frame, text="Number of Exp. =")
-        self.label_number.grid(row=2, column=0, padx=30, sticky=W)
-        self.edit_number = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_expnumber))
-        self.edit_number.grid(row=2, column=0, padx=150, sticky=W)
+        self.mag_blue_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_min_mag), font=self.font)
+        self.mag_blue_entry.place(x=20, y=230, anchor=W)
+        self.mag_green_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                     textvariable=DoubleVar(value=ini_min_mag), font=self.font)
+        self.mag_green_entry.place(x=90, y=230, anchor=W)
+        self.mag_red_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_min_mag), font=self.font)
+        self.mag_red_entry.place(x=160, y=230, anchor=W)
+        self.mag_nir_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_min_mag), font=self.font)
+        self.mag_nir_entry.place(x=230, y=230, anchor=W)
 
-        self.label_empty = Label(self.input_frame, text="").grid(row=3, column=0)
+        self.set_wave_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_wave), font=self.font, bg="khaki")
+        self.set_wave_entry.place(x=300, y=200, anchor=W)
 
-        self.label_mag = Label(self.input_frame, text="Target Magnitude (AB):")
-        self.label_mag.grid(row=4, column=0, padx=30, pady=5, sticky=W)
+        self.mag_wave_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_min_mag), font=self.font, bg="khaki")
+        self.mag_wave_entry.place(x=300, y=230, anchor=W)
 
-        self.label_mag_blue = Label(self.input_frame, text="Blue").grid(row=5, column=0, padx=30, sticky=W)
-        self.label_mag_green = Label(self.input_frame, text="Green").grid(row=5, column=0, padx=90, sticky=W)
-        self.label_mag_red = Label(self.input_frame, text="Red").grid(row=5, column=0, padx=150, sticky=W)
-        self.label_mag_nir = Label(self.input_frame, text="NIR").grid(row=5, column=0, padx=210, sticky=W)
+        # Sky Brightness (AB)
+        self.sky_label = Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=c2)
+        self.sky_label.place(x=20, y=290, anchor=W)
 
-        self.edit_magB = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_magB.grid(row=6, column=0, padx=30, sticky=W)
-        self.edit_magG = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_magG.grid(row=6, column=0, padx=90, sticky=W)
-        self.edit_magR = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_magR.grid(row=6, column=0, padx=150, sticky=W)
-        self.edit_magN = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_magN.grid(row=6, column=0, padx=210, sticky=W)
+        self.sky_blue_label = Label(self.input_frame, text="Blue", font=self.font, bg=c2)
+        self.sky_blue_label.place(x=20, y=320, anchor=W)
+        self.sky_green_label = Label(self.input_frame, text="Green", font=self.font, bg=c2)
+        self.sky_green_label.place(x=90, y=320, anchor=W)
+        self.sky_red_label = Label(self.input_frame, text="Red", font=self.font, bg=c2)
+        self.sky_red_label.place(x=160, y=320, anchor=W)
+        self.sky_nir_label = Label(self.input_frame, text="NIR", font=self.font, bg=c2)
+        self.sky_nir_label.place(x=230, y=320, anchor=W)
 
-        self.edit_mag_wave = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_wave))
-        self.edit_mag_wave.grid(row=5, column=0, padx=270, sticky=W)
-        self.edit_magW = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_magW.grid(row=6, column=0, padx=270, sticky=W)
+        self.sky_blue_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_sky[0]), font=self.font)
+        self.sky_blue_entry.place(x=20, y=350, anchor=W)
+        self.sky_green_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                     textvariable=DoubleVar(value=ini_sky[1]), font=self.font)
+        self.sky_green_entry.place(x=90, y=350, anchor=W)
+        self.sky_red_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_sky[2]), font=self.font)
+        self.sky_red_entry.place(x=160, y=350, anchor=W)
+        self.sky_nir_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_sky[3]), font=self.font)
+        self.sky_nir_entry.place(x=230, y=350, anchor=W)
 
-        self.label_empty = Label(self.input_frame, text="").grid(row=7, column=0)
+        self.sky_wave_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_sky[4]), font=self.font, bg="khaki")
+        self.sky_wave_entry.place(x=300, y=350, anchor=W)
 
-        self.label_sky = Label(self.input_frame, text="Sky Brightness (AB):").grid(row=8, column=0, padx=30, sticky=W)
+        # Mag. Range (AB)
+        self.mag_range_label = Label(self.input_frame, text="Mag. Range (AB):", font=self.font, bg=c2)
+        self.mag_range_label.place(x=400, y=80, anchor=W)
 
-        self.label_sky_blue = Label(self.input_frame, text="Blue").grid(row=9, column=0, padx=30, sticky=W)
-        self.label_sky_green = Label(self.input_frame, text="Green").grid(row=9, column=0, padx=90, sticky=W)
-        self.label_sky_red = Label(self.input_frame, text="Red").grid(row=9, column=0, padx=150, sticky=W)
-        self.label_sky_nir = Label(self.input_frame, text="NIR").grid(row=9, column=0, padx=210, sticky=W)
+        self.min_mag_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_min_mag), font=self.font)
+        self.min_mag_entry.place(x=550, y=80, anchor=W)
+        self.max_mag_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                   textvariable=DoubleVar(value=ini_max_mag), font=self.font)
+        self.max_mag_entry.place(x=640, y=80, anchor=W)
 
-        self.edit_skyB = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_sky[0]))
-        self.edit_skyB.grid(row=10, column=0, padx=30, sticky=W)
-        self.edit_skyG = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_sky[1]))
-        self.edit_skyG.grid(row=10, column=0, padx=90, sticky=W)
-        self.edit_skyR = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_sky[2]))
-        self.edit_skyR.grid(row=10, column=0, padx=150, sticky=W)
-        self.edit_skyN = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_sky[3]))
-        self.edit_skyN.grid(row=10, column=0, padx=210, sticky=W)
+        self.bar_label = Label(self.input_frame, text="-", font=self.font, bg=c2)
+        self.bar_label.place(x=620, y=80, anchor=W)
 
-        self.label_empty = Label(self.input_frame, text="").grid(row=11, column=0, padx=30, sticky=SW)
+        # Wave. Range
+        self.wave_range_label = Label(self.input_frame, text="Wave. Range:", font=self.font, bg=c2)
+        self.wave_range_label.place(x=400, y=170, anchor=W)
 
-        # self.edit_sky_wave = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_wave))
-        # self.edit_sky_wave.grid(row=8, column=0, padx=270, sticky=W)
-        self.edit_skyW = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_sky[4]))
-        self.edit_skyW.grid(row=10, column=0, padx=270, sticky=W)
+        self.wave_mode = StringVar()
+        self.wave_mode.set("Blue")
 
-        self.label_mag_range = Label(self.input_frame, text="Mag. Range (AB):")
-        self.label_mag_range.grid(row=0, column=0, padx=90, sticky=E)
+        self.wave_blue_radio = Radiobutton(self.input_frame, text="Blue", variable=self.wave_mode,
+                                           value="Blue", command=self.ui_wave_enable, font=self.font, bg=c2)
+        self.wave_blue_radio.place(x=520, y=170, anchor=W)
 
-        self.edit_tmag = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_tmag))
-        self.edit_tmag.grid(row=1, column=0, padx=135, sticky=E)
-        self.edit_emag = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_emag))
-        self.edit_emag.grid(row=1, column=0, padx=60, sticky=E)
-        self.label_bar = Label(self.input_frame, text="-").grid(row=1, column=0, padx=120, sticky=E)
+        self.wave_green_radio = Radiobutton(self.input_frame, text="Green", variable=self.wave_mode,
+                                            value="Green", command=self.ui_wave_enable, font=self.font, bg=c2)
+        self.wave_green_radio.place(x=520, y=200, anchor=W)
 
-        self.label_wave_range = Label(self.input_frame, text="Wave. Range:")
-        self.label_wave_range.grid(row=4, column=0, padx=110, sticky=E)
+        self.wave_red_radio = Radiobutton(self.input_frame, text="Red", variable=self.wave_mode,
+                                          value="Red", command=self.ui_wave_enable, font=self.font, bg=c2)
+        self.wave_red_radio.place(x=520, y=230, anchor=W)
 
-        self.radio_waveB = Radiobutton(self.input_frame, text="Blue", variable=self.mode,
-                                        value="Blue", command=self.mode_select)
-        self.radio_waveB.grid(row=5, column=0, padx=140, sticky=E)
+        self.wave_nir_radio = Radiobutton(self.input_frame, text="NIR", variable=self.wave_mode,
+                                          value="NIR", command=self.ui_wave_enable, font=self.font, bg=c2)
+        self.wave_nir_radio.place(x=520, y=260, anchor=W)
 
-        self.radio_waveG = Radiobutton(self.input_frame, text="Green", variable=self.mode,
-                                      value="Green", command=self.mode_select)
-        self.radio_waveG.grid(row=6, column=0, padx=131,sticky=E)
+        self.set_wave_radio = Radiobutton(self.input_frame, text="", variable=self.wave_mode,
+                                          value="Input Wave", command=self.ui_wave_enable, font=self.font, bg=c2)
+        self.set_wave_radio.place(x=520, y=290, anchor=W)
 
-        self.radio_waveR = Radiobutton(self.input_frame, text="Red", variable=self.mode,
-                                      value="Red", command=self.mode_select)
-        self.radio_waveR.grid(row=7, column=0, padx=145, sticky=E)
+        self.min_wave_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_min_wave), font=self.font, bg="khaki")
+        self.min_wave_entry.place(x=550, y=290, anchor=W)
 
-        self.radio_waveN = Radiobutton(self.input_frame, text="NIR", variable=self.mode,
-                                      value="NIR", command=self.mode_select)
-        self.radio_waveN.grid(row=8, column=0, padx=145, sticky=E)
+        self.max_wave_entry = Entry(self.input_frame, width=6, justify=CENTER,
+                                    textvariable=DoubleVar(value=ini_max_wave), font=self.font, bg="khaki")
+        self.max_wave_entry.place(x=640, y=290, anchor=W)
 
-        self.radio_waveW = Radiobutton(self.input_frame, text=" ", variable=self.mode,
-                                      value="Input", command=self.mode_select)
-        self.radio_waveW.grid(row=9, column=0, padx=164, sticky=E)
+        self.bar_label = Label(self.input_frame, text="-", font=self.font, bg=c2)
+        self.bar_label.place(x=620, y=290, anchor=W)
 
-        self.edit_twave = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_twave))
-        self.edit_twave.grid(row=9, column=0, padx=115, sticky=E)
-        self.edit_ewave = Entry(self.input_frame, width=7, justify=CENTER, textvariable=DoubleVar(value=ini_ewave))
-        self.edit_ewave.grid(row=9, column=0, padx=40, sticky=E)
-        self.label_bar = Label(self.input_frame, text="-").grid(row=9, column=0, padx=100, sticky=E)
+        # Run
+        self.execute_window = PanedWindow(self.master, orient="vertical")
+        self.execute_frame = LabelFrame(self.execute_window, bg=c0, bd=0)
+        self.execute_window.add(self.execute_frame)
+        self.execute_window.place(x=0, y=735, width=800, height=65)
+
+        self.run_button = Button(self.execute_frame, text="RUN", width=15, command=self.run, font=self.font, bg="white")
+        self.run_button.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        # Global variables
+        self.mag = 0
+        self.sky = 0
+        self.min_wave = 0
+        self.max_wave = 0
+
+        # GUI Initialization
+        self.ui_enable()
+        self.ui_wave_enable()
+
+        self.mode_func = functions.Functions()
+        print('...... Done!')
 
 
-        # Buttons
-        self.btn_run = Button(self.btn_frame, text="Run", width=8, command=self.run)
-        self.btn_run.grid(row=0, column=1, padx=1, pady=20)
+    def ui_target_magnitude(self, status):  # add 20210324 by T-G. Ji
+        self.mag_blue_entry.config(state=status)
+        self.mag_green_entry.config(state=status)
+        self.mag_red_entry.config(state=status)
+        self.mag_nir_entry.config(state=status)
+        self.set_wave_entry.config(state=status)
+        self.mag_wave_entry.config(state=status)
 
-        self.edit_tmag.config(state='disable')
-        self.edit_emag.config(state='disable')
-        self.edit_twave.config(state='disable')
-        self.edit_ewave.config(state='disable')
-        self.radio_waveB.config(state='disable')
-        self.radio_waveG.config(state='disable')
-        self.radio_waveR.config(state='disable')
-        self.radio_waveN.config(state='disable')
-        self.radio_waveW.config(state='disable')
+    def ui_sky_brightness(self, status):  # add 20210324 by T-G. Ji
+        self.sky_blue_entry.config(state=status)
+        self.sky_green_entry.config(state=status)
+        self.sky_red_entry.config(state=status)
+        self.sky_nir_entry.config(state=status)
+        self.sky_wave_entry.config(state=status)
 
-    def mode_select(self):
+    def ui_mag_range(self, status):  # add 20210324 by T-G. Ji
+        self.min_mag_entry.config(state=status)
+        self.max_mag_entry.config(state=status)
+
+    def ui_wave_range(self, status):  # add 20210324 by T-G. Ji
+        self.wave_blue_radio.config(state=status)
+        self.wave_green_radio.config(state=status)
+        self.wave_red_radio.config(state=status)
+        self.wave_nir_radio.config(state=status)
+        self.set_wave_radio.config(state=status)
+        self.min_wave_entry.config(state=status)
+        self.max_wave_entry.config(state=status)
+
+        if status == 'normal':
+            if self.wave_mode.get() != "Input Wave":
+                self.min_wave_entry.config(state='disable')
+                self.max_wave_entry.config(state='disable')
+
+    def ui_enable(self):  # add 20210324 by T-G. Ji
         if self.mode.get() == "S/N Calculation":
-            self.edit_magB.config(state='normal')
-            self.edit_magG.config(state='normal')
-            self.edit_magR.config(state='normal')
-            self.edit_magN.config(state='normal')
-            self.edit_mag_wave.config(state='normal')
-            self.edit_magW.config(state='normal')
-            self.edit_tmag.config(state='disable')
-            self.edit_emag.config(state='disable')
-            self.edit_skyB.config(state='normal')
-            self.edit_skyG.config(state='normal')
-            self.edit_skyR.config(state='normal')
-            self.edit_skyN.config(state='normal')
-            self.edit_skyW.config(state='normal')
-            self.edit_twave.config(state='disable')
-            self.edit_ewave.config(state='disable')
-            self.radio_waveB.config(state='disable')
-            self.radio_waveG.config(state='disable')
-            self.radio_waveR.config(state='disable')
-            self.radio_waveN.config(state='disable')
-            self.radio_waveW.config(state='disable')
-
+            self.ui_mag_range('disable')
+            self.ui_wave_range('disable')
+            self.ui_target_magnitude('normal')
+            self.ui_sky_brightness('normal')
 
         elif self.mode.get() == "S/N vs. Magnitude":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='disable')
-            self.edit_mag_wave.config(state='disable')
-            self.edit_magW.config(state='disable')
-            self.edit_tmag.config(state='normal')
-            self.edit_emag.config(state='normal')
-            self.edit_skyB.config(state='normal')
-            self.edit_skyG.config(state='normal')
-            self.edit_skyR.config(state='normal')
-            self.edit_skyN.config(state='normal')
-            self.edit_skyW.config(state='normal')
-            self.edit_twave.config(state='disable')
-            self.edit_ewave.config(state='disable')
-            self.radio_waveB.config(state='disable')
-            self.radio_waveG.config(state='disable')
-            self.radio_waveR.config(state='disable')
-            self.radio_waveN.config(state='disable')
-            self.radio_waveW.config(state='disable')
+            self.ui_target_magnitude('disable')
+            self.ui_wave_range('disable')
+            self.ui_mag_range('normal')
+            self.ui_sky_brightness('normal')
 
         elif self.mode.get() == "S/N vs. Wavelength":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='disable')
-            self.edit_mag_wave.config(state='disable')
-            self.edit_magW.config(state='disable')
-            self.edit_tmag.config(state='disable')
-            self.edit_emag.config(state='disable')
-            self.edit_skyB.config(state='disable')
-            self.edit_skyG.config(state='disable')
-            self.edit_skyR.config(state='disable')
-            self.edit_skyN.config(state='disable')
-            self.edit_skyW.config(state='disable')
-            self.edit_twave.config(state='normal')
-            self.edit_ewave.config(state='normal')
-            self.radio_waveB.config(state='normal')
-            self.radio_waveG.config(state='normal')
-            self.radio_waveR.config(state='normal')
-            self.radio_waveN.config(state='normal')
-            self.radio_waveW.config(state='normal')
+            self.ui_target_magnitude('normal')
+            self.ui_sky_brightness('disable')
+            self.ui_mag_range('disable')
+            self.ui_wave_range('normal')
+            self.set_wave_entry.config(state='disable')
 
+    def ui_wave_enable(self):  # add 20210324 by T-G. Ji
+        if self.wave_mode.get() == "Input Wave":
+            self.min_wave_entry.config(state='normal')
+            self.max_wave_entry.config(state='normal')
 
-        elif self.mode.get() == "Blue":
-            self.edit_magB.config(state='normal')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='disable')
-            self.edit_magW.config(state='disable')
-            self.edit_skyB.config(state='normal')
-            self.edit_skyG.config(state='disable')
-            self.edit_skyR.config(state='disable')
-            self.edit_skyN.config(state='disable')
-            self.edit_skyW.config(state='disable')
-        elif self.mode.get() == "Green":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='normal')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='disable')
-            self.edit_magW.config(state='disable')
-            self.edit_skyB.config(state='disable')
-            self.edit_skyG.config(state='normal')
-            self.edit_skyR.config(state='disable')
-            self.edit_skyN.config(state='disable')
-            self.edit_skyW.config(state='disable')
-        elif self.mode.get() == "Red":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='normal')
-            self.edit_magN.config(state='disable')
-            self.edit_magW.config(state='disable')
-            self.edit_skyB.config(state='disable')
-            self.edit_skyG.config(state='disable')
-            self.edit_skyR.config(state='normal')
-            self.edit_skyN.config(state='disable')
-            self.edit_skyW.config(state='disable')
-        elif self.mode.get() == "NIR":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='normal')
-            self.edit_magW.config(state='disable')
-            self.edit_skyB.config(state='disable')
-            self.edit_skyG.config(state='disable')
-            self.edit_skyR.config(state='disable')
-            self.edit_skyN.config(state='normal')
-            self.edit_skyW.config(state='disable')
-        elif self.mode.get() == "Input":
-            self.edit_magB.config(state='disable')
-            self.edit_magG.config(state='disable')
-            self.edit_magR.config(state='disable')
-            self.edit_magN.config(state='disable')
-            self.edit_magW.config(state='normal')
-            self.edit_skyB.config(state='disable')
-            self.edit_skyG.config(state='disable')
-            self.edit_skyR.config(state='disable')
-            self.edit_skyN.config(state='disable')
-            self.edit_skyW.config(state='normal')
+        else:
+            self.min_wave_entry.config(state='disable')
+            self.max_wave_entry.config(state='disable')
 
+    # change 20210324 by T-G. Ji
     def run(self):
+        res_mode = self.res_combo.get()
+        wave_mode = self.wave_mode.get()
+        cal_mode = self.mode.get()
+        set_wave = float(self.set_wave_entry.get())
+        pwv = float(self.pwv_entry.get())
+        exp_t = float(self.exp_time_entry.get())
+        exp_n = float(self.exp_num_entry.get())
+        min_mag = float(self.min_mag_entry.get())
+        max_mag = float(self.max_mag_entry.get())
 
-        mag_arr = [float(self.edit_magB.get()), float(self.edit_magG.get()),
-                  float(self.edit_magR.get()), float(self.edit_magN.get()),
-                   float(self.edit_magW.get())]
+        mag_arr = [float(self.mag_blue_entry.get()), float(self.mag_green_entry.get()),
+                   float(self.mag_red_entry.get()), float(self.mag_nir_entry.get()),
+                   float(self.mag_wave_entry.get()), float(self.mag_wave_entry.get())]
 
-        sky_arr = [float(self.edit_skyB.get()), float(self.edit_skyG.get()),
-                    float(self.edit_skyR.get()), float(self.edit_skyN.get()),
-                   float(self.edit_skyW.get())]
+        sky_arr = [float(self.sky_blue_entry.get()), float(self.sky_green_entry.get()),
+                   float(self.sky_red_entry.get()), float(self.sky_nir_entry.get()),
+                   float(self.sky_wave_entry.get()), float(self.sky_wave_entry.get())]
 
-        mag_wave = float(self.edit_mag_wave.get())
+        # change 20210325 by T-G. Ji
+        if res_mode == "LR":
+            if cal_mode == "S/N Calculation":
+                self.mode_func.signal_to_noise_low(res_mode, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave)
 
-        r_mode = self.cmb_rmode.get()
-        t_exp = float(self.edit_exptime.get())
-        n_exp = float(self.edit_number.get())
+            elif cal_mode == "S/N vs. Magnitude":
+                self.mode_func.plot_sn_mag(res_mode, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
 
-        if self.mode.get() == "S/N Calculation":
-            if mag_wave != 0:
-                ADD_PARAMETERS(mag_wave)
+            elif cal_mode == "S/N vs. Wavelength":
+                if wave_mode == "Blue":
+                    self.mag = float(self.mag_blue_entry.get())
+                    self.sky = float(self.sky_blue_entry.get())
+                    self.min_wave = 360
+                    self.max_wave = 560
+                elif wave_mode == "Green":
+                    self.mag = float(self.mag_green_entry.get())
+                    self.sky = float(self.sky_green_entry.get())
+                    self.min_wave = 540
+                    self.max_wave = 740
+                elif wave_mode == "Red":
+                    self.mag = float(self.mag_red_entry.get())
+                    self.sky = float(self.sky_red_entry.get())
+                    self.min_wave = 715
+                    self.max_wave = 985
+                elif wave_mode == "NIR":
+                    self.mag = float(self.mag_nir_entry.get())
+                    self.sky = float(self.sky_nir_entry.get())
+                    self.min_wave = 960
+                    self.max_wave = 1320
+                else:
+                    self.mag = float(self.mag_wave_entry.get())
+                    self.sky = float(self.sky_wave_entry.get())
+                    self.min_wave = float(self.min_wave_entry.get())
+                    self.max_wave = float(self.max_wave_entry.get())
 
-            single_sn(self.cmb_rmode.get(), float(self.edit_exptime.get()),
-                      float(self.edit_number.get()), mag_arr, sky_arr, mag_wave)
-
-        elif self.mode.get() == "S/N vs. Magnitude":
-
-            plot_sn_mag(self.cmb_rmode.get(), float(self.edit_exptime.get()),
-                        float(self.edit_number.get()), float(self.edit_tmag.get()),
-                        float(self.edit_emag.get()), sky_arr)
-
-        elif self.mode.get() == "Blue":
-            mag = float(self.edit_magB.get())
-            sky = float(self.edit_skyB.get())
-            twave = 360
-            ewave = 560
-            plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave)
-
-
-        elif self.mode.get() == "Green":
-            mag = float(self.edit_magB.get())
-            sky = float(self.edit_skyB.get())
-            twave = 540
-            ewave = 740
-            plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave)
-
-        elif self.mode.get() == "Red":
-            mag = float(self.edit_magR.get())
-            sky = float(self.edit_skyR.get())
-            twave = 715
-            ewave = 985
-            plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave)
-
-
-        elif self.mode.get() == "NIR":
-            mag = float(self.edit_magN.get())
-            sky = float(self.edit_skyN.get())
-            twave = 960
-            ewave = 1320
-            plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave)
-
-
-        elif self.mode.get() == "Input":
-            mag = float(self.edit_magW.get())
-            sky = float(self.edit_skyW.get())
-            twave = float(self.edit_twave.get())
-            ewave = float(self.edit_ewave.get())
-            plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave)
-
-def plot_sn_wave(r_mode, t_exp, n_exp, mag, sky, twave, ewave):
-    if r_mode == "LR":
-        wave_index = np.arange(twave, ewave, 1)
-        nlen = len(wave_index)
-        B_sky_LR = np.zeros(nlen)
-        signal = np.zeros(nlen)
-        noise = np.zeros(nlen)
-        result = np.zeros(nlen)
-
-        for i in range(0, nlen):
-            ADD_PARAMETERS(wave_index[i])
-            B_sky_LR[i] = (t_exp * n_exp) * A_telescope * TAU_atmosphere_LR[4] * \
-                          TAU_opt_LR[4] * TAU_IE_LR[4] * S_ZM * 10.0 ** (-0.4 * sky) / (h * LR[4])
-            signal[i] = (t_exp * n_exp) * A_telescope * TAU_atmosphere_LR[4] * \
-                        TAU_opt_LR[4] * TAU_IE_LR[4] * S_ZM * 10.0 ** (-0.4 * mag) / (h * LR[4])
-            noise[i] = math.sqrt(signal[i] + B_sky_LR[i] + N_res * (t_exp * n_dark[4] + n_read[4] ** 2))
-            result[i] = signal[i] / noise[i]
-
-        output.display_sn_wave(r_mode, t_exp, n_exp, mag, sky, result, twave, ewave, wave_index)
+                self.mode_func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n,
+                                            self.mag, self.sky, self.min_wave, self.max_wave)
+            else:
+                return None

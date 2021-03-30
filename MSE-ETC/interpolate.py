@@ -1,64 +1,142 @@
+"""This is the interpolation module of MSE ETC.
+This module executes....
+
+Modification Log
+2020.02.25 - First created by Taeeun Kim
+2020.03.24 - Updated by Tae-Geun Ji
+2020.03.29 - Updated by Tae-Geun Ji
+"""
+
 from parameters import *
 from scipy import interpolate
 import numpy as np
+import time
 
-Wave_Arr = np.array([360, 370, 400, 482, 626, 767, 900, 910, 950, 962, 1235, 1300, 1500, 1662, 1800])
-TEL_M1_ZeCoat_Arr = np.array([0.936, 0.941, 0.959, 0.937, 0.954, 0.954, 0.970, 0.968, 0.958, 0.966, 0.966, 0.975, 0.974, 0.963, 0.963])
-TEL_WFC_ADC_Arr = np.array([0.523, 0.594, 0.767, 0.856, 0.803, 0.824, 0.849, 0.849, 0.847, 0.846, 0.812, 0.794, 0.743, 0.675, 0.584])
-SIP_FiTS_LMR_Arr = np.array([0.570, 0.605, 0.688, 0.784, 0.849, 0.865, 0.871, 0.871, 0.862, 0.868, 0.809, 0.807, 0.774, 0.810, 0.690])
-SIP_LR_Arr = np.array([0.331, 0.396, 0.493, 0.496, 0.534, 0.530, 0.543, 0.511, 0.383, 0.457, 0.478, 0.392, 0.459, 0.438, 0.239])
-TAU_IE_LR_Arr = np.array([0.549, 0.572, 0.604, 0.604, 0.607, 0.627, 0.648, 0.650, 0.657, 0.659, 0.689, 0.685, 0.663, 0.581, 0.518])
+# change 20210324 by T-G. Ji
+class Throughput:
 
-def ADD_PARAMETERS(wave):
-    if wave < 360:
-        wave = 360
-    elif wave > 1320:
-        wave = 1320
+    def __init__(self):
 
-    INTERP_TEL_M1_ZeCoat(wave)
-    INTERP_TEL_WFC_ADC(wave)
-    INTERP_SIP_FiTS_LMR(wave)
-    INTERP_SIP_LR(wave)
-    INTERP_TAU_IE_LR(wave)
-    SELECT_n_read(wave)
-    SELECT_LR(wave)
+        print('...... Reading skytable for Low Resolution')
 
-    TAU_opt_LR[4] = ENCL[4] * TEL_MSTR[4] * TEL_M1_ZeCoat[4] * TEL_PFHS[4] * \
-                    TEL_WFC_ADC[4] * SIP_PosS[4] * SIP_FiTS_LMR[4] * SIP_LR[4]
+        blue_low_path = 'SKY/MSE_AM1_BLUE_2550.dat'
+        green_low_path = 'SKY/MSE_AM1_GREEN_3650.dat'
+        red_low_path = 'SKY/MSE_AM1_RED_3600.dat'
+        nir_low_path = 'SKY/MSE_AM1_NIR_3600.dat'
 
-def INTERP_TEL_M1_ZeCoat(wave):
-    func = interpolate.interp1d(Wave_Arr, TEL_M1_ZeCoat_Arr, kind='cubic')
-    TEL_M1_ZeCoat[4] = func(wave)
+        self.data_blue_low = np.genfromtxt(blue_low_path, names=('wavelength', 'data1', 'data2', 'data3'))
+        self.data_green_low = np.genfromtxt(green_low_path, names=('wavelength', 'data1', 'data2', 'data3'))
+        self.data_red_low = np.genfromtxt(red_low_path, names=('wavelength', 'data1', 'data2', 'data3'))
+        self.data_nir_low = np.genfromtxt(nir_low_path, names=('wavelength', 'data1', 'data2', 'data3'))
 
-def INTERP_TEL_WFC_ADC(wave):
-    func = interpolate.interp1d(Wave_Arr, TEL_WFC_ADC_Arr, kind='cubic')
-    TEL_WFC_ADC[4] = func(wave)
+        self.wave_blue = []
+        self.wave_green = []
+        self.wave_red = []
+        self.wave_nir = []
 
-def INTERP_SIP_FiTS_LMR(wave):
-    func = interpolate.interp1d(Wave_Arr, SIP_FiTS_LMR_Arr, kind='cubic')
-    SIP_FiTS_LMR[4] = func(wave)
+        self.atmo_blue = []
+        self.atmo_green = []
+        self.atmo_red = []
+        self.atmo_nir = []
 
-def INTERP_SIP_LR(wave):
-    func = interpolate.interp1d(Wave_Arr, SIP_LR_Arr, kind='cubic')
-    SIP_LR[4] = func(wave)
+        self.tau_wave = []
+        self.tel_m1_zecoat_arr = []
+        self.tel_wfc_adc_arr = []
+        self.sip_fits_arr = []
+        self.sip_arr = []
 
-def INTERP_TAU_IE_LR(wave):
-    func = interpolate.interp1d(Wave_Arr, TAU_IE_LR_Arr, kind='cubic')
-    TAU_IE_LR[4] = func(wave)
+        self.data_pwv = [1.0, 2.5, 7.5]
+        self.data_atmo = []
+        self.tau_atmo = 0
+        self.tau_opt = 0
+        self.tau_ie = 0
 
-def SELECT_n_read(wave):
-    if 360 <= wave <= 900:
-        n_read[4] = (13.4/math.sqrt(7.2))
-    elif 950 < wave <= 1800:
-        n_read[4] = (21.4/math.sqrt(7.2))
+    def set_data(self, res_mode):
+        if res_mode == "LR":
+            self.wave_blue = self.data_blue_low['wavelength']
+            self.wave_green = self.data_green_low['wavelength']
+            self.wave_red = self.data_red_low['wavelength']
+            self.wave_nir = self.data_nir_low['wavelength']
 
-def SELECT_LR(wave):
-    if 360 <= wave <= 560:
-        LR[4] = 2550
-    elif 560 < wave <= 740:
-        LR[4] = 3650
-    elif 715 < wave <= 985:
-        LR[4] = 3600
-    elif 960 < wave <= 1320:
-        LR[4] = 3600
+            nlen = len(self.data_blue_low)
+            self.atmo_blue = [[0] * 3 for i in range(nlen)]
 
+            for i in range(0, nlen):
+                self.atmo_blue[i] = [self.data_blue_low['data1'][i],
+                                     self.data_blue_low['data2'][i],
+                                     self.data_blue_low['data3'][i]]
+
+            self.wave_green = self.data_green_low['wavelength']
+
+            nlen = len(self.data_green_low)
+            self.atmo_green = [[0] * 3 for i in range(nlen)]
+
+            for i in range(0, nlen):
+                self.atmo_green[i] = [self.data_green_low['data1'][i],
+                                      self.data_green_low['data2'][i],
+                                      self.data_green_low['data3'][i]]
+
+            nlen = len(self.data_red_low)
+            self.atmo_red = [[0] * 3 for i in range(nlen)]
+
+            for i in range(0, nlen):
+                self.atmo_red[i] = [self.data_red_low['data1'][i],
+                                    self.data_red_low['data2'][i],
+                                    self.data_red_low['data3'][i]]
+
+            nlen = len(self.data_nir_low)
+            self.atmo_nir = [[0] * 3 for i in range(nlen)]
+
+            for i in range(0, nlen):
+                self.atmo_nir[i] = [self.data_nir_low['data1'][i],
+                                    self.data_nir_low['data2'][i],
+                                    self.data_nir_low['data3'][i]]
+
+            data = np.loadtxt("Throughput_LR.dat")
+
+            self.tau_wave = data[:, 0]
+            self.tel_m1_zecoat_arr = data[:, 1]
+            self.tel_wfc_adc_arr = data[:, 2]
+            self.sip_fits_arr = data[:, 3]
+            self.sip_arr = data[:, 4]
+            self.data_tau_ie = data[:, 5]
+
+    def tau_atmo_blue(self, pwv, wave):
+        func = interpolate.interp2d(self.data_pwv, self.wave_blue, self.atmo_blue, kind='linear')
+        self.tau_atmo = func(pwv, wave)
+
+        return self.tau_atmo
+
+    def tau_atmo_green(self, pwv, wave):
+        func = interpolate.interp2d(self.data_pwv, self.wave_green, self.atmo_green, kind='linear')
+        self.tau_atmo = func(pwv, wave)
+
+        return self.tau_atmo
+
+    def tau_atmo_red(self, pwv, wave):
+        func = interpolate.interp2d(self.data_pwv, self.wave_red, self.atmo_red, kind='linear')
+        self.tau_atmo = func(pwv, wave)
+
+        return self.tau_atmo
+
+    def tau_atmo_nir(self, pwv, wave):
+        func = interpolate.interp2d(self.data_pwv, self.wave_nir, self.atmo_nir, kind='linear')
+        self.tau_atmo = func(pwv, wave)
+
+        return self.tau_atmo
+
+    def tau_opt_res(self, wave):
+        func_tel_m1_zecoat = interpolate.interp1d(self.tau_wave, self.tel_m1_zecoat_arr, kind='cubic')
+        func_tel_wfc_adc = interpolate.interp1d(self.tau_wave, self.tel_wfc_adc_arr, kind='cubic')
+        func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr, kind='cubic')
+        func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr, kind='cubic')
+
+        self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR * func_tel_wfc_adc(wave) \
+                         * SIP_POSS_LR * func_sip_fits(wave) * func_sip(wave)
+        return self.tau_opt
+
+    def tau_ie_res(self, wave):
+        func_tau_ie = interpolate.interp1d(self.tau_wave, self.data_tau_ie, kind='cubic')
+        self.tau_ie = func_tau_ie(wave)
+
+        return self.tau_ie
