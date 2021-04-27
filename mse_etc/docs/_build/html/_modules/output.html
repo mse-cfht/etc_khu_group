@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>output &mdash; MSE-ETC 0.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/mse_favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/mse_etc_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSE-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>output</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for output</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Output module of MSE-ETC.</span>
+
+
+<span class="sd">Modification Log:</span>
+<span class="sd">    * 2021.01.19 - First created by Tae-Geun Ji &amp; Soojong Pak</span>
+<span class="sd">    * 2021.02.25 - Version 0.1.2 was updated by Taeeun Kim</span>
+<span class="sd">    * 2021.03.24 - Updated by Tae-Geun Ji</span>
+<span class="sd">    * 2021.03.29 - Updated by Tae-Geun Ji</span>
+<span class="sd">    * 2021.04.09 - Updated by Hojae Ahn</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">parameters</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pylab</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="display_single"><a class="viewcode-back" href="../output.html#output.display_single">[docs]</a><span class="k">def</span> <span class="nf">display_single</span><span class="p">(</span><span class="n">res_mode</span><span class="p">,</span> <span class="n">pwv</span><span class="p">,</span> <span class="n">exp_t</span><span class="p">,</span> <span class="n">exp_n</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">sky</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">wave</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==========================================================================&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The calculation Signal-to-Noise from single magnitude input&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res_mode</span> <span class="o">==</span> <span class="s2">&quot;LR&quot;</span><span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Resolution Mode   = Low Resolution&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PWV [mm]          = </span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pwv</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Time [s] = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_t</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Number   = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Band</span><span class="se">\t</span><span class="s1"> Mag. </span><span class="se">\t</span><span class="s1"> Sky </span><span class="se">\t</span><span class="s1"> S/N&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Blue]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Green]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Red]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[NIR]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%.1f</span><span class="s1">]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> (Band = </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">mag</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">BAND_LR</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">RES_LR</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%.1f</span><span class="s1">]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> (Band = </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">mag</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">BAND_LR</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="display_simple_text"><a class="viewcode-back" href="../output.html#output.display_simple_text">[docs]</a><span class="k">def</span> <span class="nf">display_simple_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==========================================================================&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="display_exp_time"><a class="viewcode-back" href="../output.html#output.display_exp_time">[docs]</a><span class="k">def</span> <span class="nf">display_exp_time</span><span class="p">(</span><span class="n">res_mode</span><span class="p">,</span> <span class="n">pwv</span><span class="p">,</span> <span class="n">target_sn</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">sky</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">wave</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==========================================================================&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The calculation exposure time for target S/N&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res_mode</span> <span class="o">==</span> <span class="s2">&quot;LR&quot;</span><span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Resolution Mode   = Low Resolution&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PWV [mm]          = </span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pwv</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Number   = 1&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Target S/N   = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">target_sn</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Band</span><span class="se">\t</span><span class="s1"> Mag. </span><span class="se">\t</span><span class="s1"> Sky </span><span class="se">\t</span><span class="s1"> ExpTime [s]&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Blue]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Green]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Red]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[NIR]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%.1f</span><span class="s1">]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> (Band = </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">mag</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">BAND_LR</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">RES_LR</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%.1f</span><span class="s1">]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%f</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> (Band = </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">mag</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">sky</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">BAND_LR</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="display_sn_mag"><a class="viewcode-back" href="../output.html#output.display_sn_mag">[docs]</a><span class="k">def</span> <span class="nf">display_sn_mag</span><span class="p">(</span><span class="n">res_mode</span><span class="p">,</span> <span class="n">pwv</span><span class="p">,</span> <span class="n">exp_t</span><span class="p">,</span> <span class="n">exp_n</span><span class="p">,</span> <span class="n">min_mag</span><span class="p">,</span> <span class="n">max_mag</span><span class="p">,</span> <span class="n">mag_range</span><span class="p">,</span> <span class="n">sky</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==========================================================================&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The calculation Signal-to-Noise vs. Magnitude&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res_mode</span> <span class="o">==</span> <span class="s2">&quot;LR&quot;</span><span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Resolution Mode   = Low Resolution&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PWV [mm]          = </span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pwv</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Time [s] = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_t</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Number   = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Magnitude Range [mag] : </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">min_mag</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">max_mag</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Band</span><span class="se">\t</span><span class="s1"> Sky&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Blue]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sky</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Green]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sky</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[Red]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sky</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[NIR]</span><span class="se">\t</span><span class="s1"> </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sky</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mag_range</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">mag_range</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                <span class="n">mag_range</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mag_range</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;ETC version 0.2.0 (t=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_t</span> <span class="o">+</span> <span class="s1">&#39;s, N=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_n</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Point Target Magnitude (AB)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Signal-to-Noise&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Blue_LR&#39;</span><span class="p">,</span> <span class="s1">&#39;Green_LR&#39;</span><span class="p">,</span> <span class="s1">&#39;Red_LR&#39;</span><span class="p">,</span> <span class="s1">&#39;NIR_LR&#39;</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+        <span class="n">locs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">xticks</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">,</span> <span class="s1">&#39;large&#39;</span><span class="p">)</span>
+        <span class="n">locs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">yticks</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span><span class="s1">&#39;fontsize&#39;</span><span class="p">,</span> <span class="s1">&#39;large&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">min_mag</span><span class="p">,</span> <span class="n">max_mag</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="display_sn_wave"><a class="viewcode-back" href="../output.html#output.display_sn_wave">[docs]</a><span class="k">def</span> <span class="nf">display_sn_wave</span><span class="p">(</span><span class="n">res_mode</span><span class="p">,</span> <span class="n">wave_mode</span><span class="p">,</span> <span class="n">pwv</span><span class="p">,</span> <span class="n">exp_t</span><span class="p">,</span> <span class="n">exp_n</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">sky</span><span class="p">,</span> <span class="n">min_wave</span><span class="p">,</span> <span class="n">max_wave</span><span class="p">,</span> <span class="n">sn_arr</span><span class="p">,</span> <span class="n">wave_arr</span><span class="p">):</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==========================================================================&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The calculation Signal-to-Noise vs. Wavelength&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res_mode</span> <span class="o">==</span> <span class="s2">&quot;LR&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Resolution Mode   = Low Resolution&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PWV [mm]          = </span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pwv</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Time [s] = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_t</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exposure Number   = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Magnitude = </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mag</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sky = </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sky</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Calculated Wavelength Range [nm] : </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">min_wave</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">max_wave</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wave_mode</span> <span class="o">==</span> <span class="s2">&quot;Input Wave&quot;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wave_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sn_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Blue&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wave_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sn_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Green&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wave_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sn_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Red&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wave_arr</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">sn_arr</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;NIR&#39;</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wave_arr</span><span class="p">,</span> <span class="n">sn_arr</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">wave_mode</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;ETC version 0.2.0 (pwv=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pwv</span> <span class="o">+</span> <span class="s1">&#39;, t=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_t</span> <span class="o">+</span> <span class="s1">&#39;s, N=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">exp_n</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+                      <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+        <span class="c1">#plt.legend([wave_mode], fontsize=15)</span>
+
+        <span class="n">locs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">xticks</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">,</span> <span class="s1">&#39;large&#39;</span><span class="p">)</span>
+        <span class="n">locs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">yticks</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">,</span> <span class="s1">&#39;large&#39;</span><span class="p">)</span>
+
+        <span class="c1"># ax.set_yscale(&#39;log&#39;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">min_wave</span><span class="p">,</span> <span class="n">max_wave</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        else:</span>
+<span class="sd">            print(&#39;Resolution Mode   = Low Resolution&#39;)</span>
+<span class="sd">            print(&#39;PWV [mm]          = %.1f&#39; % pwv)</span>
+<span class="sd">            print(&#39;Exposure Time [s] = %d&#39; % exp_t)</span>
+<span class="sd">            print(&#39;Exposure Number   = %d&#39; % exp_n)</span>
+<span class="sd">            print(&#39;Magnitude = %.2f&#39; % mag)</span>
+<span class="sd">            print(&#39;Sky = %.2f&#39; % sky)</span>
+<span class="sd">            print(&#39;Calculated Wavelength Range [nm] : %.2f&#39; % min_wave + &#39; - &#39; + &#39;%.2f&#39; % max_wave)</span>
+<span class="sd">            print(&#39; &#39;)</span>
+
+<span class="sd">            plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor=&#39;w&#39;, edgecolor=&#39;k&#39;)</span>
+
+<span class="sd">            ax = plt.subplot(111)</span>
+<span class="sd">            ax.plot(wave_arr, sn_arr, &#39;black&#39;, linewidth=1)</span>
+
+<span class="sd">            plt.title(&#39;ETC version 0.2.0 (pwv=&#39; + &#39;%.1f&#39; % pwv + &#39;, t=&#39; + &#39;%d&#39; % exp_t + &#39;s, N=&#39; + &#39;%d&#39; % exp_n + &#39;)&#39;,</span>
+<span class="sd">                      fontsize=16)</span>
+<span class="sd">            plt.xlabel(&#39;Wavelength&#39;, fontsize=15)</span>
+<span class="sd">            plt.ylabel(&#39;SNR&#39;,fontsize=15)</span>
+<span class="sd">            plt.legend([wave_mode], fontsize=15)</span>
+
+<span class="sd">            locs, labels = xticks()</span>
+<span class="sd">            plt.setp(labels, &#39;fontsize&#39;, &#39;large&#39;)</span>
+<span class="sd">            locs, labels = yticks()</span>
+<span class="sd">            plt.setp(labels,&#39;fontsize&#39;, &#39;large&#39;)</span>
+
+<span class="sd">            #ax.set_yscale(&#39;log&#39;)</span>
+<span class="sd">            plt.xlim([min_wave, max_wave])</span>
+<span class="sd">            ax.grid(color=&#39;k&#39;, linestyle=&#39;-&#39;, which=&#39;minor&#39;, linewidth=0.5)</span>
+<span class="sd">            ax.grid(color=&#39;k&#39;, linestyle=&#39;-&#39;, which=&#39;major&#39;, linewidth=1)</span>
+
+<span class="sd">            plt.show()</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, MSE-ETC Software Team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

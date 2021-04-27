@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>interpolate &mdash; MSE-ETC 0.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/mse_favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/mse_etc_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MSE-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>interpolate</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for interpolate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Interpolation module of MSE ETC.</span>
+
+<span class="sd">This module determines the atmospheric transmission depending on pwv </span>
+<span class="sd">and wavelength. This specifies transmission values affected by various </span>
+<span class="sd">variables using data preprocessed using convolution and interpolation.</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    * calculate the atmospheric throughput</span>
+
+<span class="sd">Modification Log:</span>
+<span class="sd">    * 2020.02.25 - First created by Taeeun Kim</span>
+<span class="sd">    * 2020.03.24 - Updated by Tae-Geun Ji</span>
+<span class="sd">    * 2020.03.29 - Updated by Tae-Geun Ji</span>
+<span class="sd">    * 2021.04.21 - Updated by Mingyoeng Yang</span>
+<span class="sd">    * 2021.04.26 - Updated by Mingyeong Yang</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">parameters</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># change 20210421 by MY</span>
+<div class="viewcode-block" id="Throughput"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput">[docs]</a><span class="k">class</span> <span class="nc">Throughput</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Determines the atmospheric throughput.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...... Reading skytable for atmospheric throughput calculation.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Atmospheric transmission data for low resolution</span>
+        <span class="n">blue_low_box_path</span> <span class="o">=</span> <span class="s1">&#39;SKY/MSE_AM1_box_blue.fits&#39;</span>
+        <span class="n">green_low_box_path</span> <span class="o">=</span> <span class="s1">&#39;SKY/MSE_AM1_box_green.fits&#39;</span>
+        <span class="n">red_low_box_path</span> <span class="o">=</span> <span class="s1">&#39;SKY/MSE_AM1_box_red.fits&#39;</span>
+        <span class="n">nir_low_box_path</span> <span class="o">=</span> <span class="s1">&#39;SKY/MSE_AM1_box_nir.fits&#39;</span>
+
+        <span class="c1"># read fits files and set data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_blue_low</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blue_low_box_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_green_low</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">green_low_box_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_red_low</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">red_low_box_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_nir_low</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">nir_low_box_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_blue_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_blue_low</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_green_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_green_low</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_red_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_red_low</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_nir_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_nir_low</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="c1"># close files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_blue_low</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_green_low</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_red_low</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_nir_low</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tel_m1_zecoat_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tel_wfc_adc_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sip_fits_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sip_arr</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_atmo</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_opt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ie</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Throughput.set_data"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res_mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the data array suitable for each resolution mode.</span>
+
+<span class="sd">        params:</span>
+<span class="sd">            res_mode (str): The resolution mode.</span>
+<span class="sd">                * Low resolution</span>
+<span class="sd">                * Moderate resolution</span>
+<span class="sd">                * High resolution</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">res_mode</span> <span class="o">==</span> <span class="s2">&quot;LR&quot;</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_blue_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_green_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_red_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_nir_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_blue_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">data_blue_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">data_blue_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_green_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">data_green_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">data_green_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_red_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">data_red_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">data_red_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_nir_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">data_nir_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">data_nir_low</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;Throughput_LR.dat&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tel_m1_zecoat_arr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tel_wfc_adc_arr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sip_fits_arr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sip_arr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_tau_ie</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Throughput.tau_atmo_blue"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_atmo_blue">[docs]</a>    <span class="k">def</span> <span class="nf">tau_atmo_blue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the atmospheric throughput in blue wavelength.</span>
+
+<span class="sd">        This fuction finds a specific atmospheric throughput suitable </span>
+<span class="sd">        for pwv. It uses 1-D inpolation of data array in the blue wavelength band.</span>
+
+<span class="sd">        params:</span>
+<span class="sd">            pwv (float): Precipitable Water Vapor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tau_atmo (float): The atmospheric throughput.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">7.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_blue</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span></div>
+
+<div class="viewcode-block" id="Throughput.tau_atmo_green"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_atmo_green">[docs]</a>    <span class="k">def</span> <span class="nf">tau_atmo_green</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the atmospheric throughput in green wavelength. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">7.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_green</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span></div>
+
+<div class="viewcode-block" id="Throughput.tau_atmo_red"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_atmo_red">[docs]</a>    <span class="k">def</span> <span class="nf">tau_atmo_red</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the atmospheric throughput in red wavelength. &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">7.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_red</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span></div>
+
+<div class="viewcode-block" id="Throughput.tau_atmo_nir"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_atmo_nir">[docs]</a>    <span class="k">def</span> <span class="nf">tau_atmo_nir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the atmospheric throughput in nir-infrared wavelength. &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">==</span> <span class="mf">7.5</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atmo_nir</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span></div>
+
+
+<div class="viewcode-block" id="Throughput.Cal_tau_atmo"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.Cal_tau_atmo">[docs]</a>    <span class="k">def</span> <span class="nf">Cal_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">transmission1</span><span class="p">,</span> <span class="n">transmission2</span><span class="p">,</span> <span class="n">transmission7</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the atmospheric throughput with parameters.</span>
+
+<span class="sd">        This function estimates the transmission value corresponding to a specific pwv </span>
+<span class="sd">        by calculating transmission data with different pwv.</span>
+
+<span class="sd">        params:</span>
+<span class="sd">            wave (float): The wavelength band.</span>
+<span class="sd">                * Blue 360- 560 nm</span>
+<span class="sd">                * Green 540 - 740 nm</span>
+<span class="sd">                * Red 715 - 985 nm</span>
+<span class="sd">                * Nir 960 - x nm</span>
+<span class="sd">            transmission1 (float): The atmospheric transmission extracted under pwv = 1.0.</span>
+<span class="sd">            transmission2 (float): The atmospheric transmission extracted under pwv = 2.5.</span>
+<span class="sd">            transmission7 (float): The atmospheric transmission extracted under pwv = 7.5.</span>
+<span class="sd">            pwv (float): Precipitable Water Vapor.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            y (float): The atmospheric transmission.</span>
+
+<span class="sd">        Raises:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">N_data</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwv</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pwv</span> <span class="o">&lt;=</span> <span class="mf">2.5</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_data</span><span class="p">):</span>
+                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">transmission1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pwv</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">transmission2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">transmission1</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="c1">#if pwv &gt;= 2 and pwv &lt;= 4:</span>
+                <span class="c1">#for i in np.arange(0, N_data):</span>
+                <span class="c1">#y[i] = transmission2[i] + (pwv - 2) * (transmission4[i] - transmission2[i]) / (4 - 2)</span>
+        <span class="k">elif</span> <span class="n">pwv</span> <span class="o">&gt;</span> <span class="mf">2.5</span> <span class="ow">and</span> <span class="n">pwv</span> <span class="o">&lt;=</span> <span class="mf">7.5</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_data</span><span class="p">):</span>
+                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">transmission2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pwv</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">transmission7</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">transmission2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mf">7.5</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span>
+
+        <span class="k">return</span> <span class="n">y</span></div>
+
+<div class="viewcode-block" id="Throughput.Get_tau_atmo"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.Get_tau_atmo">[docs]</a>    <span class="k">def</span> <span class="nf">Get_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_pwv</span><span class="p">,</span> <span class="n">input_wavelength</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the result value for input parameters.</span>
+
+<span class="sd">        This function returns the atmospheric throughput according to the wavelength band and pwv</span>
+<span class="sd">        inputed by the user, using the calculation defined in the middle level functions above. </span>
+
+<span class="sd">        params:</span>
+<span class="sd">            input_pwv (float): pwv set by the user</span>
+<span class="sd">            input_wavelength (float): wavelength band set by the user</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            tau_atmo (float): The atmospheric transmission</span>
+
+<span class="sd">        Raises:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="mf">350.0</span> <span class="o">&lt;=</span> <span class="n">input_wavelength</span> <span class="o">&lt;</span> <span class="mf">540.0</span><span class="p">:</span>
+
+            <span class="n">transmission1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_blue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">transmission2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_blue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">transmission7</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_blue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">throughput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cal_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">,</span> <span class="n">transmission1</span><span class="p">,</span> <span class="n">transmission2</span><span class="p">,</span> <span class="n">transmission7</span><span class="p">,</span> <span class="n">input_pwv</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_blue</span><span class="p">,</span> <span class="n">throughput</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
+
+
+        <span class="k">if</span> <span class="mf">540.0</span> <span class="o">&lt;=</span> <span class="n">input_wavelength</span> <span class="o">&lt;</span> <span class="mf">715.0</span><span class="p">:</span>
+
+            <span class="n">transmission1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_green</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">transmission2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_green</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">transmission7</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_green</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">throughput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cal_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">,</span> <span class="n">transmission1</span><span class="p">,</span> <span class="n">transmission2</span><span class="p">,</span> <span class="n">transmission7</span><span class="p">,</span> <span class="n">input_pwv</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_green</span><span class="p">,</span> <span class="n">throughput</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
+
+
+        <span class="k">if</span> <span class="mf">715.0</span> <span class="o">&lt;=</span> <span class="n">input_wavelength</span> <span class="o">&lt;</span> <span class="mi">960</span><span class="p">:</span>
+
+            <span class="n">transmission1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_red</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">transmission2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_red</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">transmission7</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_red</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">throughput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cal_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">,</span> <span class="n">transmission1</span><span class="p">,</span> <span class="n">transmission2</span><span class="p">,</span> <span class="n">transmission7</span><span class="p">,</span> <span class="n">input_pwv</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_red</span><span class="p">,</span> <span class="n">throughput</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
+
+
+        <span class="k">if</span> <span class="mi">960</span> <span class="o">&lt;=</span> <span class="n">input_wavelength</span><span class="p">:</span>
+
+            <span class="n">transmission1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_nir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">transmission2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_nir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">transmission7</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo_nir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pwv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">throughput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cal_tau_atmo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">,</span> <span class="n">transmission1</span><span class="p">,</span> <span class="n">transmission2</span><span class="p">,</span> <span class="n">transmission7</span><span class="p">,</span> <span class="n">input_pwv</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wave_nir</span><span class="p">,</span> <span class="n">throughput</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">input_wavelength</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_atmo</span></div>
+
+<div class="viewcode-block" id="Throughput.tau_opt_res"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_opt_res">[docs]</a>    <span class="k">def</span> <span class="nf">tau_opt_res</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wave</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the optical values. &quot;&quot;&quot;</span>
+
+        <span class="n">func_tel_m1_zecoat</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tel_m1_zecoat_arr</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+        <span class="n">func_tel_wfc_adc</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tel_wfc_adc_arr</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+        <span class="n">func_sip_fits</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sip_fits_arr</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+        <span class="n">func_sip</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sip_arr</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_opt</span> <span class="o">=</span> <span class="n">ENCL_LR</span> <span class="o">*</span> <span class="n">TEL_MSTR_LR</span> <span class="o">*</span> <span class="n">func_tel_m1_zecoat</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span> <span class="o">*</span> <span class="n">TEL_PFHS_LR</span> <span class="o">*</span> <span class="n">func_tel_wfc_adc</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span> \
+                         <span class="o">*</span> <span class="n">SIP_POSS_LR</span> <span class="o">*</span> <span class="n">func_sip_fits</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span> <span class="o">*</span> <span class="n">func_sip</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_opt</span></div>
+
+<div class="viewcode-block" id="Throughput.tau_ie_res"><a class="viewcode-back" href="../interpolate.html#interpolate.Throughput.tau_ie_res">[docs]</a>    <span class="k">def</span> <span class="nf">tau_ie_res</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wave</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the injection efficiency. &quot;&quot;&quot;</span>
+
+        <span class="n">func_tau_ie</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_wave</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_tau_ie</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ie</span> <span class="o">=</span> <span class="n">func_tau_ie</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ie</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, MSE-ETC Software Team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
