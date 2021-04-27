@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>functions module &mdash; MSE-ETC 0.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/mse_favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="interpolate module" href="interpolate.html" />
+    <link rel="prev" title="parameters module" href="parameters.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/mse_etc_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initial_values.html">initial_values module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html">parameters module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpolate.html">interpolate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output.html">output module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MSE-ETC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules</a> &raquo;</li>
+        
+      <li>functions module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/functions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-functions">
+<span id="functions-module"></span><h1>functions module<a class="headerlink" href="#module-functions" title="Permalink to this headline">¶</a></h1>
+<p>Function module of MSE ETC.</p>
+<dl class="simple">
+<dt>Modification Log:</dt><dd><ul class="simple">
+<li><p>2021.01.19 - The first MSE-ETC version was created by Tae-Geun Ji &amp; Soojong Pak</p></li>
+<li><p>2021.03.24 - Updated by Tae-Geun Ji</p></li>
+<li><p>2021.03.29 - Updated by Tae-Geun Ji</p></li>
+<li><p>2021.04.09 - Updated by Hojae Ahn</p></li>
+<li><p>2021.04.21 - Updated by Mingyoeng Yang</p></li>
+<li><p>2021.04.26 - Updated by Mingyeong Yang</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="functions.Functions">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">functions.</span></code><code class="sig-name descname"><span class="pre">Functions</span></code><a class="reference internal" href="_modules/functions.html#Functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="functions.Functions.exp_time_cal">
+<code class="sig-name descname"><span class="pre">exp_time_cal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_sn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#Functions.exp_time_cal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions.exp_time_cal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="functions.Functions.plot_sn_mag">
+<code class="sig-name descname"><span class="pre">plot_sn_mag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#Functions.plot_sn_mag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions.plot_sn_mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="functions.Functions.plot_sn_wave">
+<code class="sig-name descname"><span class="pre">plot_sn_wave</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_wave</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#Functions.plot_sn_wave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions.plot_sn_wave" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="functions.Functions.signal_to_noise_low">
+<code class="sig-name descname"><span class="pre">signal_to_noise_low</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#Functions.signal_to_noise_low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions.signal_to_noise_low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="functions.Functions.solve_bisection">
+<code class="sig-name descname"><span class="pre">solve_bisection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_sn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#Functions.solve_bisection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.Functions.solve_bisection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="interpolate.html" class="btn btn-neutral float-right" title="interpolate module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="parameters.html" class="btn btn-neutral float-left" title="parameters module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, MSE-ETC Software Team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

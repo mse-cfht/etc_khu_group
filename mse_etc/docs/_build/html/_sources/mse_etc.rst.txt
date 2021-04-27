@@ -1,0 +1,13 @@
+mse_etc
+===================================
+
+.. automodule:: mse_etc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Modules
+-------
+
+.. automodule:: mse_etc.interpolate
+      :members:
