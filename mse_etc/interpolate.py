@@ -35,22 +35,67 @@ class Throughput:
         red_low_box_path = 'SKY/MSE_AM1_box_red.fits'
         nir_low_box_path = 'SKY/MSE_AM1_box_nir.fits'
 
-        # read fits files and set data
+        # Atmospheric transmission data for moderate resolution
+        blue_moderate_box_path = 'SKY/MSE_AM1_box_blue_MR.fits'
+        green_moderate_box_path = 'SKY/MSE_AM1_box_green_MR.fits'
+        red_moderate_box_path = 'SKY/MSE_AM1_box_red_MR.fits'
+        nir_moderate_box_path = 'SKY/MSE_AM1_box_NIR_MR.fits'
+
+        # Atmospheric transmission data for high resolution
+        #blue_high_box_path = 'SKY/MSE_AM3_box_blue.fits'
+        #green_high_box_path = 'SKY/MSE_AM3_box_green.fits'
+        #red_high_box_path = 'SKY/MSE_AM3_box_red.fits'
+
+        # read fits files and set data (LR)
         self.file_blue_low = fits.open(blue_low_box_path)
         self.file_green_low = fits.open(green_low_box_path)
         self.file_red_low = fits.open(red_low_box_path)
         self.file_nir_low = fits.open(nir_low_box_path)
 
+        # read fits files and set data (MR)
+        self.file_blue_moderate = fits.open(blue_moderate_box_path)
+        self.file_green_moderate = fits.open(green_moderate_box_path)
+        self.file_red_moderate = fits.open(red_moderate_box_path)
+        self.file_nir_moderate = fits.open(nir_moderate_box_path)
+
+        # read fits files and set data (HR)
+        #self.file_blue_high = fits.open(blue_high_box_path)
+        #self.file_green_high = fits.open(green_high_box_path)
+        #self.file_red_high = fits.open(red_high_box_path)
+
+        #read data (LR)
         self.data_blue_low = self.file_blue_low[1].data
         self.data_green_low = self.file_green_low[1].data
         self.data_red_low = self.file_red_low[1].data
         self.data_nir_low = self.file_nir_low[1].data
+
+        #read data (MR)
+        self.data_blue_moderate = self.file_blue_moderate[1].data
+        self.data_green_moderate = self.file_green_moderate[1].data
+        self.data_red_moderate = self.file_red_moderate[1].data
+        self.data_nir_moderate = self.file_nir_moderate[1].data
+
+        #read data (HR)
+        #self.data_blue_high = self.file_blue_high[1].data
+        #self.data_green_high = self.file_green_high[1].data
+        #self.data_red_high = self.file_red_high[1].data
 
         # close files
         self.file_blue_low.close()
         self.file_green_low.close()
         self.file_red_low.close()
         self.file_nir_low.close()
+
+        # close files
+        self.file_blue_moderate.close()
+        self.file_green_moderate.close()
+        self.file_red_moderate.close()
+        self.file_nir_moderate.close()
+
+        # close files
+        #self.file_blue_high.close()
+        #self.file_green_high.close()
+        #self.file_red_high.close()
 
         self.atmo_blue = []
         self.atmo_green = []
@@ -118,6 +163,77 @@ class Throughput:
             self.sip_arr = data[:, 4]
             self.data_tau_ie = data[:, 5]
 
+        elif res_mode == "MR":
+
+            self.wave_blue = self.data_blue_moderate.field(0)
+            self.wave_green = self.data_green_moderate.field(0)
+            self.wave_red = self.data_red_moderate.field(0)
+            self.wave_nir = self.data_nir_moderate.field(0)
+
+            self.atmo_blue = []
+            self.atmo_blue = np.array([self.data_blue_moderate.field(1),
+                                       self.data_blue_moderate.field(2),
+                                       self.data_blue_moderate.field(3)])
+
+            self.atmo_green = []
+            self.atmo_green = np.array([self.data_green_moderate.field(1),
+                                        self.data_green_moderate.field(2),
+                                        self.data_green_moderate.field(3)])
+
+            self.atmo_red = []
+            self.atmo_red = np.array([self.data_red_moderate.field(1),
+                                      self.data_red_moderate.field(2),
+                                      self.data_red_moderate.field(3)])
+
+            self.atmo_nir = []
+            self.atmo_nir = np.array([self.data_nir_moderate.field(1),
+                                      self.data_nir_moderate.field(1),
+                                      self.data_nir_moderate.field(1)])
+
+            data = np.loadtxt("Throughput_LR.dat")
+
+            self.tau_wave = data[:, 0]
+            self.tel_m1_zecoat_arr = data[:, 1]
+            self.tel_wfc_adc_arr = data[:, 2]
+            self.sip_fits_arr = data[:, 3]
+            self.sip_arr = data[:, 4]
+            self.data_tau_ie = data[:, 5]
+
+        elif res_mode == "HR":
+
+            self.wave_blue = self.data_blue_low.field(0)
+            self.wave_green = self.data_green_low.field(0)
+            self.wave_red = self.data_red_low.field(0)
+            self.wave_nir = self.data_nir_low.field(0)
+
+            self.atmo_blue = []
+            self.atmo_blue = np.array([self.data_blue_low.field(1),
+                                       self.data_blue_low.field(2),
+                                       self.data_blue_low.field(3)])
+
+            self.atmo_green = []
+            self.atmo_green = np.array([self.data_green_low.field(1),
+                                        self.data_green_low.field(2),
+                                        self.data_green_low.field(3)])
+
+            self.atmo_red = []
+            self.atmo_red = np.array([self.data_red_low.field(1),
+                                      self.data_red_low.field(2),
+                                      self.data_red_low.field(3)])
+
+            self.atmo_nir = []
+            self.atmo_nir = np.array([self.data_nir_low.field(1),
+                                      self.data_nir_low.field(1),
+                                      self.data_nir_low.field(1)])
+
+            data = np.loadtxt("Throughput_LR.dat")
+
+            self.tau_wave = data[:, 0]
+            self.tel_m1_zecoat_arr = data[:, 1]
+            self.tel_wfc_adc_arr = data[:, 2]
+            self.sip_fits_arr = data[:, 3]
+            self.sip_arr = data[:, 4]
+            self.data_tau_ie = data[:, 5]
 
     def tau_atmo_blue(self, pwv):
         """Returns the atmospheric throughput in blue wavelength.
@@ -303,6 +419,61 @@ class Throughput:
 
         return self.tau_atmo
 
+    def Get_tau_atmo_MR(self, input_pwv, input_wavelength):
+
+        """Return the result value for input parameters.
+
+                This function returns the atmospheric throughput according to the wavelength band and pwv
+                inputed by the user, using the calculation defined in the middle level functions above.
+
+                params:
+                    input_pwv (float): pwv set by the user
+                    input_wavelength (float): wavelength band set by the user
+
+                Returns:
+                    tau_atmo (float): The atmospheric transmission
+
+                Raises:
+
+                """
+
+        if 391.0 <= input_wavelength < 510.0:
+            transmission1 = self.tau_atmo_blue(self.data_pwv[0])
+            transmission2 = self.tau_atmo_blue(self.data_pwv[1])
+            transmission7 = self.tau_atmo_blue(self.data_pwv[2])
+
+            throughput = self.Cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', bounds_error=False, )
+
+        if 576.0 <= input_wavelength < 700.0:
+            transmission1 = self.tau_atmo_green(self.data_pwv[0])
+            transmission2 = self.tau_atmo_green(self.data_pwv[1])
+            transmission7 = self.tau_atmo_green(self.data_pwv[2])
+
+            throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False, )
+
+        if 737.0 <= input_wavelength < 900:
+            transmission1 = self.tau_atmo_red(self.data_pwv[0])
+            transmission2 = self.tau_atmo_red(self.data_pwv[1])
+            transmission7 = self.tau_atmo_red(self.data_pwv[2])
+
+            throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False, )
+
+        if 1457.0 <= input_wavelength:
+            transmission1 = self.tau_atmo_nir(self.data_pwv[0])
+            transmission2 = self.tau_atmo_nir(self.data_pwv[1])
+            transmission7 = self.tau_atmo_nir(self.data_pwv[2])
+
+            throughput = self.Cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False, )
+
+        self.tau_atmo = func(input_wavelength)
+
+        return self.tau_atmo
+
+
     def tau_opt_res(self, wave):
         """ Returns the optical values. """
 
@@ -311,6 +482,7 @@ class Throughput:
         func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr, kind='cubic')
         func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr, kind='cubic')
 
+        #LR, MR, HR has same value for ENCL, TEL_MSTR, TEL_PFHS, SIP_POSS
         self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR * func_tel_wfc_adc(wave) \
                          * SIP_POSS_LR * func_sip_fits(wave) * func_sip(wave)
         return self.tau_opt
