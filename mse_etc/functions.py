@@ -216,26 +216,26 @@ class Functions:
             WAVE_HR[4] = wave
             WAVE_HR[5] = wave
 
-            self.tau_atmo_arr[0] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[0])
-            self.tau_atmo_arr[1] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[1])
-            self.tau_atmo_arr[2] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[2])
+            self.tau_atmo_arr[0] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[0])
+            self.tau_atmo_arr[1] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[1])
+            self.tau_atmo_arr[2] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[2])
             #self.tau_atmo_arr[3] = self.tau_func.Get_tau_atmo(pwv, WAVE_MR[3])
 
-            if 360 <= wave < 460:
+            if 360 <= wave < 440:
                 RES_HR[4] = RES_HR[0]
                 BAND_HR[4] = BAND_HR[0]
                 N_READ_HR[4] = N_READ_HR[0]
-                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[4])
-            elif 440 < wave < 620:
+                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[4])
+            elif 460 < wave < 600:
                 RES_HR[4] = RES_HR[1]
                 BAND_HR[4] = BAND_HR[1]
                 N_READ_HR[4] = N_READ_HR[1]
-                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[4])
-            elif 600 < wave < 900:
+                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[4])
+            elif 620 < wave < 900:
                 RES_HR[4] = RES_HR[2]
                 BAND_HR[4] = BAND_HR[2]
                 N_READ_HR[4] = N_READ_HR[2]
-                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[4])
+                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[4])
 
             if 440 <= wave <= 460:
                 RES_HR[4] = RES_HR[0]
@@ -244,8 +244,8 @@ class Functions:
                 BAND_HR[5] = BAND_HR[1]
                 N_READ_HR[4] = N_READ_HR[0]
                 N_READ_HR[5] = N_READ_HR[1]
-                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[4])
-                self.tau_atmo_arr[5] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[5])
+                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[4])
+                self.tau_atmo_arr[5] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[5])
             elif 600 <= wave <= 620:
                 RES_HR[4] = RES_HR[1]
                 RES_HR[5] = RES_HR[2]
@@ -253,8 +253,8 @@ class Functions:
                 BAND_HR[5] = BAND_HR[2]
                 N_READ_HR[4] = N_READ_HR[1]
                 N_READ_HR[5] = N_READ_HR[2]
-                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[4])
-                self.tau_atmo_arr[5] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[5])
+                self.tau_atmo_arr[4] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[4])
+                self.tau_atmo_arr[5] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[5])
 
             for i in range(0, self.band_n):
                 self.tau_opt_arr[i] = self.tau_func.tau_opt_res(WAVE_HR[i])
@@ -438,9 +438,9 @@ class Functions:
 
             sky_bg_arr = np.zeros(4)
 
-            self.tau_atmo_arr[0] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[0])
-            self.tau_atmo_arr[1] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[1])
-            self.tau_atmo_arr[2] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[2])
+            self.tau_atmo_arr[0] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[0])
+            self.tau_atmo_arr[1] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[1])
+            self.tau_atmo_arr[2] = self.tau_func.Get_tau_atmo_HR(pwv, WAVE_HR[2])
             #self.tau_atmo_arr[3] = self.tau_func.Get_tau_atmo(pwv, WAVE_HR[3])
 
             for i in range(0, 4):
@@ -927,7 +927,7 @@ class Functions:
             if wave_mode == "Blue":
                 for i in range(0, nlen):
                     t1 = time.time()
-                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                     self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                     self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -948,7 +948,7 @@ class Functions:
 
             elif wave_mode == "Green":
                 for i in range(0, nlen):
-                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                     self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                     self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -969,7 +969,7 @@ class Functions:
 
             elif wave_mode == "Red":
                 for i in range(0, nlen):
-                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                     self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                     self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -1015,16 +1015,16 @@ class Functions:
                 self.snr_blue = np.zeros(nlen)
                 self.snr_green = np.zeros(nlen)
                 self.snr_red = np.zeros(nlen)
-                self.snr_nir = np.zeros(nlen)
+                #self.snr_nir = np.zeros(nlen)
 
                 self.wave_blue = np.zeros(nlen)
                 self.wave_green = np.zeros(nlen)
                 self.wave_red = np.zeros(nlen)
-                self.wave_nir = np.zeros(nlen)
+                #self.wave_nir = np.zeros(nlen)
 
                 count = 0
                 for i in range(0, nlen):
-                    if 360 <= self.wave_arr[i] <= 560:
+                    if 360 <= self.wave_arr[i] <= 460:
                         count += 1
 
                 self.snr_blue = np.zeros(count)
@@ -1033,8 +1033,8 @@ class Functions:
                 count = 0
                 for i in range(0, nlen):
 
-                    if 360 <= self.wave_arr[i] <= 560:
-                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                    if 360 <= self.wave_arr[i] <= 460:
+                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                         self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                         self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -1053,7 +1053,7 @@ class Functions:
 
                 count = 0
                 for i in range(0, nlen):
-                    if 540 <= self.wave_arr[i] <= 740:
+                    if 440 <= self.wave_arr[i] <= 620:
                         count += 1
 
                 self.snr_green = np.zeros(count)
@@ -1061,7 +1061,7 @@ class Functions:
 
                 count = 0
                 for i in range(0, nlen):
-                    if 540 <= self.wave_arr[i] <= 740:
+                    if 440 <= self.wave_arr[i] <= 620:
                         self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
                         self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                         self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
@@ -1081,7 +1081,7 @@ class Functions:
 
                 count = 0
                 for i in range(0, nlen):
-                    if 715 <= self.wave_arr[i] <= 985:
+                    if 600 <= self.wave_arr[i] <= 900:
                         count += 1
 
                 self.snr_red = np.zeros(count)
@@ -1089,7 +1089,7 @@ class Functions:
 
                 count = 0
                 for i in range(0, nlen):
-                    if 715 <= self.wave_arr[i] <= 985:
+                    if 600 <= self.wave_arr[i] <= 900:
                         self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
                         self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                         self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
@@ -1138,8 +1138,8 @@ class Functions:
                         
                 """
 
-                wave_arr = [self.wave_blue, self.wave_green, self.wave_red, self.wave_nir]
-                result_arr = [self.snr_blue, self.snr_green, self.snr_red, self.snr_nir]
+                wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
+                result_arr = [self.snr_blue, self.snr_green, self.snr_red]
 
                 output.display_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, mag, sky, min_wave, max_wave,
                                        result_arr, wave_arr)

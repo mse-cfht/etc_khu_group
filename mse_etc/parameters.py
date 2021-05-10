@@ -28,8 +28,8 @@ RES_MR = [4400, 6200, 6100, 6000, 1, -1]  # B, G, R, NIR, and Input band in LR: 
 WAVE_MR = [482, 626, 767, 1662, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
 N_READ_MR = [13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 21.4/math.sqrt(7.2), 0, 0]
 # ==== HR (added by CK)
-RES_HR = [40000, 40000, 20000, 1, 1, -1]  # B, G, R, NIR, and Input band in LR: spectral resolution [nm]
-WAVE_HR = [400, 482, 767, 0, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
+RES_HR = [40000, 40000, 20000, 20000, 1, -1]  # B, G, R, NIR, and Input band in LR: spectral resolution [nm]
+WAVE_HR = [400, 482, 767, 900, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
 N_READ_HR = [13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 21.4/math.sqrt(7.2), 0, 0]
 
 

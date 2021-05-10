@@ -21,13 +21,12 @@ month = now.month
 day = now.day
 
 pwv = [1.0, 2.5, 7.5]
-res = [4400, 6200, 6100, 6000]
-wave = {4400 : 482.0, 6200 : 626.0, 6100 : 767.0, 6000 : 1662.0}
-
+res = [40000, 20000]
+wave = {400, 482, 767}
 
 # part making skymodel .fits file from .dat
 
-for l in res:
+for l in wave:
     p1 = np.genfromtxt(f'data/skymodel_MSE_pwv1.0_{l}.dat', encoding='ascii', names=('wavelength', 'tr'), dtype=None)
     p2 = np.genfromtxt(f'data/skymodel_MSE_pwv2.5_{l}.dat', encoding='ascii', names=('wavelength', 'tr'), dtype=None)
     p7 = np.genfromtxt(f'data/skymodel_MSE_pwv7.5_{l}.dat', encoding='ascii', names=('wavelength', 'tr'), dtype=None)
@@ -65,47 +64,39 @@ for l in pwv:
     hdu_index.close()
 
     # distinguish wavelength Blue/Green/Red/NIR
-    row_blue1 = data1[0:23501]                       #Blue 350-560nm
-    row_green1 = data1[21683:37436]
-    row_red1 = data1[35719:51736]
-    row_NIR1 = data1[50452:81881]
+    row_blue1 = data1[0:13665]                       #Blue 350-560nm
+    row_green1 = data1[0:37463] #11443:28590
+    row_red1 = data1[0:47224]
+
 #    nlen1 = len(row_red1)
 #    data_wave1 = np.zeros(nlen1)
 #    data_atmo1 = np.zeros(nlen1)
 #    for i in range(0, nlen1):
 #        data_wave1[i] = row_red1[i][0]
 #        data_atmo1[i] = row_red1[i][1]
-    for k in res:
+    for k in wave:
 
-        if k == 4400:
+        if k == 400.0:
             nlen1 = len(row_blue1)
             data_wave1 = np.zeros(nlen1)
             data_atmo1 = np.zeros(nlen1)
             for i in range(0, nlen1):
                 data_wave1[i] = row_blue1[i][0]
                 data_atmo1[i] = row_blue1[i][1]
-        elif k == 6200:
+        elif k == 482.0:
             nlen1 = len(row_green1)
             data_wave1 = np.zeros(nlen1)
             data_atmo1 = np.zeros(nlen1)
             for i in range(0, nlen1):
                 data_wave1[i] = row_green1[i][0]
                 data_atmo1[i] = row_green1[i][1]
-        elif k == 6100:
+        elif k == 767.0:
             nlen1 = len(row_red1)
             data_wave1 = np.zeros(nlen1)
             data_atmo1 = np.zeros(nlen1)
             for i in range(0, nlen1):
                 data_wave1[i] = row_red1[i][0]
                 data_atmo1[i] = row_red1[i][1]
-        elif k == 6000:
-            nlen1 = len(row_NIR1)
-            data_wave1 = np.zeros(nlen1)
-            data_atmo1 = np.zeros(nlen1)
-
-            for i in range(0, nlen1):
-                data_wave1[i] = row_NIR1[i][0]
-                data_atmo1[i] = row_NIR1[i][1]
 
         # Open FITS file for comparison
         fits_image_filename = f"data/skymodel_MSE_pwv{l}_{k}.fits"
@@ -120,53 +111,41 @@ for l in pwv:
 
         for t in range(0, len(data2)):
 
-            if k == 4400:
-                if data2[t][0] <= 510:
+            if k == 400:
+                if data2[t][0] <= 460:
                     index_end = t+1
                 else:
                     break
-            elif k == 6200:
-                if data2[t][0] <= 700:
+            elif k == 482:
+                if data2[t][0] <= 620:
                     index_end = t+1
                 else:
                     break
-            elif k == 6100:
-                if data2[t][0] <= 900:
-                    index_end = t+1
-                else:
-                    break
-            elif k == 6000:
+            elif k == 767:
                 break
 
         for s in range(0, len(data2)):
 
-            if k == 4400:
+            if k == 400:
                 break
-            elif k == 6200:
-                if data2[s][0] >= 576:
-                    index_start = s+1
+            elif k == 482:
+                if data2[s][0] >= 440:
+                    index_start = s
                     break
-            elif k == 6100:
-                if data2[s][0] >= 737:
-                    index_start = s+1
-                    break
-            elif k == 6000:
-                if data2[s][0] >= 1457:
-                    index_start = s+1
+            elif k == 767:
+                if data2[s][0] >= 600:
+                    index_start = s
                     break
 
-        #print(data2[1][0], l, k, index_start, index_end)
+        print(data2[1][0], l, k, index_start, index_end)
 
         #distinguish wavelength Blue/Green/Red/NIR
-        if k == 4400:
+        if k == 400:
             row_data = data2[index_start:index_end]
-        elif k == 6200:
+        elif k == 482:
             row_data = data2[index_start:index_end]
-        elif k == 6100:
+        elif k == 767:
             row_data = data2[index_start:index_end]
-        elif k == 6000:
-            row_data = data2[index_start:index_end]
-        
 
         """
         # distinguish wavelength Blue/Green/Red/NIR
@@ -187,8 +166,13 @@ for l in pwv:
             data_atmo2[i] = row_data[i][1]
 
         # Convolution
-        bin1 = wave[k] / 50000.0
-        bin2 = wave[k] / k
+        bin1 = float(k) / 50000.0
+        if k == 400:
+            bin2 = float(k) / 40000.0
+        elif k == 482:
+            bin2 = float(k) / 40000.0
+        elif k == 767:
+            bin2 = float(k) / 20000.0
         binning = bin2 / bin1
         print(binning)
 
@@ -216,21 +200,23 @@ for l in pwv:
         
         name = ' '
 
-        if k == 4400:
+        if k == 400:
             table_hdu.header['LAMDA'] = 'blue'
             name = 'blue'
-        elif k == 6200:
+        elif k == 482:
             table_hdu.header['LAMDA'] = 'green'
             name = 'green'
-        elif k == 6100:
+        elif k == 767:
             table_hdu.header['LAMDA'] = 'red'
             name = 'red'
-        elif k == 6000:
-            table_hdu.header['LAMDA'] = 'NIR'
-            name = 'NIR'
 
         table_hdu.header['PWV'] = l
-        table_hdu.header['R'] = k
+        if k == 400:
+            table_hdu.header['R'] = 40000
+        elif k ==482:
+            table_hdu.header['R'] = 40000
+        elif k == 767:
+            table_hdu.header['R'] = 20000
 
         hdul = fits.HDUList([primary_hdu, table_hdu])
         hdul.writeto(f'data/result_MSE_pwv{l}_{name}_{k}.fits', overwrite=True)
@@ -244,14 +230,12 @@ for l in pwv:
         ax.plot(data_wave2, data_atmo2, 'red', linewidth=1, label='red')
         ax.plot(data_wave2, result, 'blue', linewidth=1, label='blue')
 
-        if k == 4400:
-            plt.xlim([391, 510])
-        elif k == 6200:
-            plt.xlim([576, 700])
-        elif k == 6100:
-            plt.xlim([737, 900])
-        elif k == 6000:
-            plt.xlim([1457, 1780])
+        if k == 400:
+            plt.xlim([360, 460])
+        elif k == 482:
+            plt.xlim([440, 620])
+        elif k == 767:
+            plt.xlim([600, 900])
         plt.legend(["R=50000(data)",f"R={k}(data)", f"R={k}(Boxcar)"], fontsize=15)
 
         plt.title(f'pwv = {l}', fontsize=16)
@@ -263,15 +247,13 @@ for l in pwv:
 #part saving the gaussian file
 name = ' '
 
-for k in res:
-    if k == 4400:
+for k in wave:
+    if k == 400:
         name = 'blue'
-    elif k == 6200:
+    elif k == 482:
         name = 'green'
-    elif k == 6100:
+    elif k == 767:
         name = 'red'
-    elif k == 6000:
-        name = 'NIR'
     filename_pwv1 = f'data/result_MSE_pwv1.0_{name}_{k}.fits'
     filename_pwv2 = f'data/result_MSE_pwv2.5_{name}_{k}.fits'
     filename_pwv7 = f'data/result_MSE_pwv7.5_{name}_{k}.fits'
@@ -311,6 +293,7 @@ for k in res:
     table_hdu.header['DATE'] = f'{day} {month} {year}'
 
     hdul = fits.HDUList([primary_hdu, table_hdu])
-    hdul.writeto(f'SKY/MSE_AM1_box_{name}_MR.fits', overwrite=True)
+    hdul.writeto(f'SKY/MSE_AM1_box_{name}_HR.fits', overwrite=True)
+    hdul.writeto(f'SKY/MSE_AM1_box_{name}_HR.fits', overwrite=True)
 
 
