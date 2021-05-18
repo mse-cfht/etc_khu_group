@@ -7,6 +7,7 @@ Modification Log:
     * 2021.04.09 - Updated by Hojae Ahn
     * 2021.04.21 - Updated by Mingyoeng Yang
     * 2021.04.26 - Updated by Mingyeong Yang
+    * 2021.05.18 - Updated by Changgon Kim
 """
 
 from parameters import *
@@ -281,24 +282,58 @@ class Functions:
     def exp_time_cal(self, res_mode, pwv, target_sn, mag, sky, wave):  # add 210408 hojae
         self.exp_table = np.zeros(len(mag))
 
-        for idx in range(1, 5):  # from 10 to 10,000
-            self.sn_table.append(self.signal_to_noise_low(res_mode, pwv, 10**idx, 1, mag, sky, wave, False))
-        sn_table = np.array(self.sn_table)
+        if res_mode == "LR" or res_mode == "MR":
+            for idx in range(1, 5):  # from 10 to 10,000
+                self.sn_table.append(self.signal_to_noise_low(res_mode, pwv, 10 ** idx, 1, mag, sky, wave, False))
+            sn_table = np.array(self.sn_table)
 
-        # for B
-        for band in range(len(mag)-1):
-            if sn_table[0, band] > target_sn:
-                output.display_simple_text("Required exposure time of band %d single frame is shorter than 10 seconds." % band)
-                return None
-            elif (sn_table[0, band] <= target_sn) & (target_sn <= sn_table[1, band]):
-                self.exp_table[band] = self.solve_bisection(band, target_sn, 10, 100, res_mode, pwv, mag, sky, wave, False)
-            elif (sn_table[1, band] <= target_sn) & (target_sn <= sn_table[2, band]):
-                self.exp_table[band] = self.solve_bisection(band, target_sn, 100, 1000, res_mode, pwv, mag, sky, wave, False)
-            elif (sn_table[2, band] <= target_sn) & (target_sn <= sn_table[3, band]):
-                self.exp_table[band] = self.solve_bisection(band, target_sn, 1000, 10000, res_mode, pwv, mag, sky, wave, False)
-            else:
-                output.display_simple_text("Required exposure time of band %d single frame is longer than 10,000 seconds(~3 hours)." % band)
-                return None
+            # for B
+            for band in range(len(mag) - 1):
+                if sn_table[0, band] > target_sn:
+                    output.display_simple_text(
+                        "Required exposure time of band %d single frame is shorter than 10 seconds." % band)
+                    return None
+                elif (sn_table[0, band] <= target_sn) & (target_sn <= sn_table[1, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 10, 100, res_mode, pwv, mag, sky, wave,
+                                                                False)
+                elif (sn_table[1, band] <= target_sn) & (target_sn <= sn_table[2, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 100, 1000, res_mode, pwv, mag, sky,
+                                                                wave, False)
+                elif (sn_table[2, band] <= target_sn) & (target_sn <= sn_table[3, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 1000, 10000, res_mode, pwv, mag, sky,
+                                                                wave, False)
+                else:
+                    output.display_simple_text(
+                        "Required exposure time of band %d single frame is longer than 10,000 seconds(~3 hours)." % band)
+                    return None
+
+        elif res_mode == "HR":
+            for idx in range(1, 5):  # from 10 to 10,000
+                self.sn_table.append(self.signal_to_noise_low(res_mode, pwv, 10 ** idx, 1, mag, sky, wave, False))
+            sn_table = np.array(self.sn_table)
+
+            # for B
+            for band in range(len(mag) - 1):
+                if sn_table[0, band] > target_sn:
+                    output.display_simple_text(
+                        "Required exposure time of band %d single frame is shorter than 10 seconds." % band)
+                    return None
+                elif (sn_table[0, band] <= target_sn) & (target_sn <= sn_table[1, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 10, 100, res_mode, pwv, mag, sky, wave,
+                                                                False)
+                elif (sn_table[1, band] <= target_sn) & (target_sn <= sn_table[2, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 100, 1000, res_mode, pwv, mag, sky,
+                                                                wave, False)
+                elif (sn_table[2, band] <= target_sn) & (target_sn <= sn_table[3, band]):
+                    self.exp_table[band] = self.solve_bisection(band, target_sn, 1000, 10000, res_mode, pwv, mag, sky,
+                                                                wave, False)
+                elif sn_table[0, band] * sn_table[1, band] * sn_table[2, band] * sn_table[3, band] == 0:
+                    continue
+                else:
+                    output.display_simple_text(
+                        "Required exposure time of band %d single frame is longer than 10,000 seconds(~3 hours)." % band)
+                    return None
+
         output.display_exp_time(res_mode, pwv, target_sn, mag, sky, self.exp_table, wave)
         return self.exp_table
 
@@ -988,29 +1023,6 @@ class Functions:
                 output.display_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, mag, sky, min_wave, max_wave,
                                        self.signal_to_noise_arr, self.wave_arr)
 
-            elif wave_mode == "NIR":
-                """
-                for i in range(0, nlen):
-                    self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
-                    self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
-                    self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
-
-                for i in range(0, nlen):
-                    self.sky_bg_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                         * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky) / (h * RES_MR[3])
-
-                    self.signal_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                         * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * mag) / (h * RES_MR[3])
-
-                    self.noise_arr[i] = math.sqrt(self.signal_arr[i] + self.sky_bg_arr[i] + N_RES
-                                                  * (exp_t * N_DARK + N_READ_MR[3] ** 2))
-
-                    self.signal_to_noise_arr[i] = self.signal_arr[i] / self.noise_arr[i]
-
-                output.display_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, mag, sky, min_wave, max_wave,
-                                       self.signal_to_noise_arr, self.wave_arr)
-                """
-
             else:
                 self.snr_blue = np.zeros(nlen)
                 self.snr_green = np.zeros(nlen)
@@ -1062,7 +1074,7 @@ class Functions:
                 count = 0
                 for i in range(0, nlen):
                     if 440 <= self.wave_arr[i] <= 620:
-                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                         self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                         self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -1090,7 +1102,7 @@ class Functions:
                 count = 0
                 for i in range(0, nlen):
                     if 600 <= self.wave_arr[i] <= 900:
-                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
+                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo_HR(pwv, self.wave_arr[i])
                         self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
                         self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
 
@@ -1107,36 +1119,6 @@ class Functions:
                         self.wave_red[count] = self.wave_arr[i]
                         count += 1
 
-                """
-                count = 0
-                for i in range(0, nlen):
-                    if 960 <= self.wave_arr[i] <= 1320:
-                        count += 1
-
-                self.snr_nir = np.zeros(count)
-                self.wave_nir = np.zeros(count)
-
-                count = 0
-                for i in range(0, nlen):
-                    if 960 <= self.wave_arr[i] <= 1320:
-                        self.tau_atmo_arr[i] = self.tau_func.Get_tau_atmo(pwv, self.wave_arr[i])
-                        self.tau_opt_arr[i] = self.tau_func.tau_opt_res(self.wave_arr[i])
-                        self.tau_ie_arr[i] = self.tau_func.tau_ie_res(self.wave_arr[i])
-
-                        self.sky_bg_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                             * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky) / (h * RES_HR[3])
-
-                        self.signal_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                             * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * mag) / (h * RES_HR[3])
-
-                        self.noise_arr[i] = math.sqrt(self.signal_arr[i] + self.sky_bg_arr[i] + N_RES
-                                                      * (exp_t * N_DARK + N_READ_HR[3] ** 2))
-
-                        self.snr_nir[count] = self.signal_arr[i] / self.noise_arr[i]
-                        self.wave_nir[count] = self.wave_arr[i]
-                        count += 1
-                        
-                """
 
                 wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
                 result_arr = [self.snr_blue, self.snr_green, self.snr_red]

@@ -7,6 +7,7 @@ Modification Log:
     * 2021.03.24 - Updated by Tae-Geun Ji
     * 2021.03.29 - Updated by Tae-Geun Ji
     * 2021.04.09 - Updated by Hojae Ahn
+    * 2021.05.18 - Updated by Changgon Kim
 """
 
 from parameters import *
@@ -302,40 +303,6 @@ def display_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, mag, sky, min_wave, 
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
 
         plt.show()
-        """
-        else:
-            print('Resolution Mode   = Low Resolution')
-            print('PWV [mm]          = %.1f' % pwv)
-            print('Exposure Time [s] = %d' % exp_t)
-            print('Exposure Number   = %d' % exp_n)
-            print('Magnitude = %.2f' % mag)
-            print('Sky = %.2f' % sky)
-            print('Calculated Wavelength Range [nm] : %.2f' % min_wave + ' - ' + '%.2f' % max_wave)
-            print(' ')
-
-            plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
-
-            ax = plt.subplot(111)
-            ax.plot(wave_arr, sn_arr, 'black', linewidth=1)
-
-            plt.title('ETC version 0.2.0 (pwv=' + '%.1f' % pwv + ', t=' + '%d' % exp_t + 's, N=' + '%d' % exp_n + ')',
-                      fontsize=16)
-            plt.xlabel('Wavelength', fontsize=15)
-            plt.ylabel('SNR',fontsize=15)
-            plt.legend([wave_mode], fontsize=15)
-
-            locs, labels = xticks()
-            plt.setp(labels, 'fontsize', 'large')
-            locs, labels = yticks()
-            plt.setp(labels,'fontsize', 'large')
-
-            #ax.set_yscale('log')
-            plt.xlim([min_wave, max_wave])
-            ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
-            ax.grid(color='k', linestyle='-', which='major', linewidth=1)
-
-            plt.show()
-        """
 
     elif res_mode == "MR":
 

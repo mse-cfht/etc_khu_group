@@ -302,6 +302,7 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
                 self.max_wave_entry.config(state='disable')
 
     def ui_enable(self):  # add 20210324 by T-G. Ji
+
         if self.mode.get() == "S/N Calculation":
             self.ui_exp_time('normal')
             self.ui_exp_num('normal')

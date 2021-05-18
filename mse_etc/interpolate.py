@@ -435,31 +435,33 @@ class Throughput:
 
                 Raises:
 
+                This part is implemented by Changgon Kim
+                The reason using the wavelength end range of 543, 718, 1457 for each wavelength is because the interpolation fails when there are blank between other wavelengths.
                 """
 
-        if 350.0 <= input_wavelength < 510.0:
-            transmission1 = self.tau_atmo_blue(self.data_pwv[0])
-            transmission2 = self.tau_atmo_blue(self.data_pwv[1])
-            transmission7 = self.tau_atmo_blue(self.data_pwv[2])
+        if 350.0 <= input_wavelength < 543.0:
+            transmission1_m = self.tau_atmo_blue(self.data_pwv[0])
+            transmission2_m = self.tau_atmo_blue(self.data_pwv[1])
+            transmission7_m = self.tau_atmo_blue(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', bounds_error=False, )
+            throughput_m = self.Cal_tau_atmo(self.wave_blue, transmission1_m, transmission2_m, transmission7_m, input_pwv)
+            func = interpolate.interp1d(self.wave_blue, throughput_m, kind='linear', bounds_error=False,)
 
-        if 576.0 <= input_wavelength < 700.0:
+        if 543.0 <= input_wavelength < 718.0:
             transmission1 = self.tau_atmo_green(self.data_pwv[0])
             transmission2 = self.tau_atmo_green(self.data_pwv[1])
             transmission7 = self.tau_atmo_green(self.data_pwv[2])
 
             throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False, )
+            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False,)
 
-        if 737.0 <= input_wavelength < 900:
+        if 718.0 <= input_wavelength < 1457:
             transmission1 = self.tau_atmo_red(self.data_pwv[0])
             transmission2 = self.tau_atmo_red(self.data_pwv[1])
             transmission7 = self.tau_atmo_red(self.data_pwv[2])
 
             throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False, )
+            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False,)
 
         if 1457.0 <= input_wavelength:
             transmission1 = self.tau_atmo_nir(self.data_pwv[0])
@@ -467,11 +469,11 @@ class Throughput:
             transmission7 = self.tau_atmo_nir(self.data_pwv[2])
 
             throughput = self.Cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False, )
+            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False,)
 
-        self.tau_atmo = func(input_wavelength)
+        self.tau_atmo_m = func(input_wavelength)
 
-        return self.tau_atmo
+        return self.tau_atmo_m
 
     def Get_tau_atmo_HR(self, input_pwv, input_wavelength):
 
@@ -507,22 +509,14 @@ class Throughput:
             throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
             func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False, )
 
-        if 620.0 <= input_wavelength < 900.0:
+        if 620.0 <= input_wavelength:
             transmission1 = self.tau_atmo_red(self.data_pwv[0])
             transmission2 = self.tau_atmo_red(self.data_pwv[1])
             transmission7 = self.tau_atmo_red(self.data_pwv[2])
 
             throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
             func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False, )
-        """
-        if 900.0 <= input_wavelength:
-            transmission1 = self.tau_atmo_nir(self.data_pwv[0])
-            transmission2 = self.tau_atmo_nir(self.data_pwv[1])
-            transmission7 = self.tau_atmo_nir(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False, )
-        """
         self.tau_atmo = func(input_wavelength)
 
         return self.tau_atmo
