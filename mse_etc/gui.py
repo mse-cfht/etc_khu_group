@@ -302,6 +302,7 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
                 self.max_wave_entry.config(state='disable')
 
     def ui_enable(self):  # add 20210324 by T-G. Ji
+
         if self.mode.get() == "S/N Calculation":
             self.ui_exp_time('normal')
             self.ui_exp_num('normal')
@@ -403,6 +404,85 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
                     self.sky = float(self.sky_nir_entry.get())
                     self.min_wave = 960
                     self.max_wave = 1320
+                else:
+                    self.mag = float(self.mag_wave_entry.get())
+                    self.sky = float(self.sky_wave_entry.get())
+                    self.min_wave = float(self.min_wave_entry.get())
+                    self.max_wave = float(self.max_wave_entry.get())
+
+                self.mode_func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n,
+                                            self.mag, self.sky, self.min_wave, self.max_wave)
+            else:
+                return None
+
+        elif res_mode == "MR":
+            if cal_mode == "S/N Calculation":
+                self.mode_func.signal_to_noise_low(res_mode, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave, True)
+
+            elif cal_mode == "ExpTime Calculation":
+                self.mode_func.exp_time_cal(res_mode, pwv, target_sn, mag_arr, sky_arr, set_wave)
+
+            elif cal_mode == "S/N vs. Magnitude":
+                self.mode_func.plot_sn_mag(res_mode, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
+
+            elif cal_mode == "S/N vs. Wavelength":
+                if wave_mode == "Blue":
+                    self.mag = float(self.mag_blue_entry.get())
+                    self.sky = float(self.sky_blue_entry.get())
+                    self.min_wave = 391
+                    self.max_wave = 510
+                elif wave_mode == "Green":
+                    self.mag = float(self.mag_green_entry.get())
+                    self.sky = float(self.sky_green_entry.get())
+                    self.min_wave = 576
+                    self.max_wave = 700
+                elif wave_mode == "Red":
+                    self.mag = float(self.mag_red_entry.get())
+                    self.sky = float(self.sky_red_entry.get())
+                    self.min_wave = 737
+                    self.max_wave = 900
+                elif wave_mode == "NIR":
+                    self.mag = float(self.mag_nir_entry.get())
+                    self.sky = float(self.sky_nir_entry.get())
+                    self.min_wave = 1457
+                    self.max_wave = 1780
+                else:
+                    self.mag = float(self.mag_wave_entry.get())
+                    self.sky = float(self.sky_wave_entry.get())
+                    self.min_wave = float(self.min_wave_entry.get())
+                    self.max_wave = float(self.max_wave_entry.get())
+
+                self.mode_func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n,
+                                            self.mag, self.sky, self.min_wave, self.max_wave)
+            else:
+                return None
+
+        elif res_mode == "HR":
+            if cal_mode == "S/N Calculation":
+                self.mode_func.signal_to_noise_low(res_mode, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave, True)
+
+            elif cal_mode == "ExpTime Calculation":
+                self.mode_func.exp_time_cal(res_mode, pwv, target_sn, mag_arr, sky_arr, set_wave)
+
+            elif cal_mode == "S/N vs. Magnitude":
+                self.mode_func.plot_sn_mag(res_mode, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
+
+            elif cal_mode == "S/N vs. Wavelength":
+                if wave_mode == "Blue":
+                    self.mag = float(self.mag_blue_entry.get())
+                    self.sky = float(self.sky_blue_entry.get())
+                    self.min_wave = 360
+                    self.max_wave = 460
+                elif wave_mode == "Green":
+                    self.mag = float(self.mag_green_entry.get())
+                    self.sky = float(self.sky_green_entry.get())
+                    self.min_wave = 440
+                    self.max_wave = 620
+                elif wave_mode == "Red":
+                    self.mag = float(self.mag_red_entry.get())
+                    self.sky = float(self.sky_red_entry.get())
+                    self.min_wave = 600
+                    self.max_wave = 900
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())

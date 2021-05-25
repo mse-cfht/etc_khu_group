@@ -14,7 +14,7 @@ c1 = "light blue"
 c2 = "lavender"
 
 ini_etc_title = "MSE Exposure Time Calculator"  # add 20210324 by Tae-Geun Ji
-ini_etc_version = "v0.3.1"  # change 20210427 by Tae-Geun Ji
+ini_etc_version = "v1.0.0"  # change 20210427 by Tae-Geun Ji
 
 ini_pwv = 1
 ini_exptime = 1200
