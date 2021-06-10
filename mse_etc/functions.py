@@ -8,6 +8,7 @@ Modification Log:
     * 2021.04.21 - Updated by Mingyoeng Yang
     * 2021.04.26 - Updated by Mingyeong Yang
     * 2021.05.18 - Updated by Changgon Kim
+    * 2021.06.03 - Updated by Hojae Ahn
 """
 
 from parameters import *
@@ -362,7 +363,7 @@ class Functions:
 
             else:
                 return x_iter
-        return -11  # Solution does not converge
+        return -999  # Solution does not converge
 
     def plot_sn_mag(self, res_mode, pwv, exp_t, exp_n, min_mag, max_mag, sky):
         self.tau_func.set_data(res_mode)
@@ -404,17 +405,17 @@ class Functions:
 
             for i in range(0, 4):
                 sky_bg_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h*WAVE_LR[i])
+                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h*RES_LR[i])
 
             for i in range(0, nlen):
                 signal_blue[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[0] * self.tau_opt_arr[0] \
-                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_LR[0])
+                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_LR[0])
                 signal_green[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[1] * self.tau_opt_arr[1] \
-                                 * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_LR[1])
+                                 * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_LR[1])
                 signal_red[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[2] * self.tau_opt_arr[2] \
-                                 * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_LR[2])
+                                 * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_LR[2])
                 signal_nir[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[3] * self.tau_opt_arr[3] \
-                                 * self.tau_ie_arr[3] * S_ZM * 10.0 **(-0.4 * mag_arr[i]) / (h * WAVE_LR[3])
+                                 * self.tau_ie_arr[3] * S_ZM * 10.0 **(-0.4 * mag_arr[i]) / (h * RES_LR[3])
 
                 noise_blue[i] = math.sqrt(signal_blue[i]+sky_bg_arr[0]+N_RES*(exp_t*N_DARK+N_READ_LR[0]**2))
                 noise_green[i] = math.sqrt(signal_green[i]+sky_bg_arr[1]+N_RES*(exp_t*N_DARK+N_READ_LR[1]**2))
@@ -443,21 +444,20 @@ class Functions:
 
             for i in range(0, 4):
                 sky_bg_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * WAVE_MR[i])
+                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * RES_MR[i])
 
             for i in range(0, nlen):
                 signal_blue[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[0] * self.tau_opt_arr[0] \
-                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_MR[0])
+                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_MR[0])
                 signal_green[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[1] * self.tau_opt_arr[1] \
-                                  * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_MR[1])
+                                  * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_MR[1])
                 signal_red[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[2] * self.tau_opt_arr[2] \
-                                * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_MR[2])
+                                * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_MR[2])
                 signal_nir[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[3] * self.tau_opt_arr[3] \
-                                * self.tau_ie_arr[3] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_MR[3])
+                                * self.tau_ie_arr[3] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_MR[3])
 
                 noise_blue[i] = math.sqrt(signal_blue[i] + sky_bg_arr[0] + N_RES * (exp_t * N_DARK + N_READ_MR[0] ** 2))
-                noise_green[i] = math.sqrt(
-                    signal_green[i] + sky_bg_arr[1] + N_RES * (exp_t * N_DARK + N_READ_MR[1] ** 2))
+                noise_green[i] = math.sqrt(signal_green[i] + sky_bg_arr[1] + N_RES * (exp_t * N_DARK + N_READ_MR[1] ** 2))
                 noise_red[i] = math.sqrt(signal_red[i] + sky_bg_arr[2] + N_RES * (exp_t * N_DARK + N_READ_MR[2] ** 2))
                 noise_nir[i] = math.sqrt(signal_nir[i] + sky_bg_arr[3] + N_RES * (exp_t * N_DARK + N_READ_MR[3] ** 2))
 
@@ -484,15 +484,15 @@ class Functions:
 
             for i in range(0, 4):
                 sky_bg_arr[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[i] * self.tau_opt_arr[i] \
-                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * WAVE_HR[i])
+                                * self.tau_ie_arr[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * RES_HR[i])
 
             for i in range(0, nlen):
                 signal_blue[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[0] * self.tau_opt_arr[0] \
-                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_HR[0])
+                                 * self.tau_ie_arr[0] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_HR[0])
                 signal_green[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[1] * self.tau_opt_arr[1] \
-                                  * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_HR[1])
+                                  * self.tau_ie_arr[1] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_HR[1])
                 signal_red[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[2] * self.tau_opt_arr[2] \
-                                * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_HR[2])
+                                * self.tau_ie_arr[2] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * RES_HR[2])
                 #signal_nir[i] = (exp_t * exp_n) * self.a_tel * self.tau_atmo_arr[3] * self.tau_opt_arr[3] \
                 #                * self.tau_ie_arr[3] * S_ZM * 10.0 ** (-0.4 * mag_arr[i]) / (h * WAVE_HR[3])
 
