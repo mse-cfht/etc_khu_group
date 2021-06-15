@@ -5,6 +5,7 @@ Modification Log:
     * 2021.02.25 - Updated by Taeeun Kim
     * 2021.03.24 - Updated by Tae-Geun Ji
     * 2021.04.09 - Updated by Hojae Ahn
+    * 2021.06.03 - Updated by Hojae Ahn
 """
 
 from initial_values import *
@@ -17,6 +18,7 @@ import tkinter.font as font
 
 class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
     """Define the components of GUI."""
+    save = False  # class variable for checking whether data will be saved
 
     def __init__(self, master):
         super(MainGUI, self).__init__(master)
@@ -38,23 +40,30 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
         self.label_logo = Label(self.title_window, image=self.image_logo)
         self.label_logo.place(x=0, y=0)
 
-        # ==== Settings for Spectral Resolution Mode Window
+        # ==== Settings for Spectral Resolution Mode Window  # change 20210603 hojae
         self.res_window = PanedWindow(self.master, orient="vertical")
         self.res_frame = LabelFrame(self.res_window, bg=c0, bd=0)
         self.res_window.add(self.res_frame)
         self.res_window.place(x=0, y=135, width=800, height=100)
 
         self.res_label = Label(self.res_window, text="Resolution Mode Selection",
-                                      font=self.title_font, bg=c0, fg="white")
+                                      font=self.title_font, bg=c0, fg=c3)
         self.res_label.place(relx=0.5, rely=0.2, anchor=CENTER)
 
         self.resolution = StringVar()
+        self.resolution.set("LR")
 
-        self.res_combo = ttk.Combobox(self.res_window, width=12, state="readonly",
-                                             textvariable=self.resolution, font=self.font)
-        self.res_combo.place(relx=0.5, rely=0.6, anchor=CENTER)
-        self.res_combo['values'] = ('LR', 'MR', 'HR')
-        self.res_combo.current(0)
+        self.single_radio = Radiobutton(self.res_frame, text="Low resolution", variable=self.resolution,
+                                        value="LR", font=self.font, fg=c3, bg=c0, selectcolor=c4)
+        self.single_radio.place(relx=0.25, rely=0.6, anchor=CENTER)
+
+        self.single_radio = Radiobutton(self.res_frame, text="Moderate resolution", variable=self.resolution,
+                                        value="MR", font=self.font, fg=c3, bg=c0, selectcolor=c4)
+        self.single_radio.place(relx=0.5, rely=0.6, anchor=CENTER)
+
+        self.single_radio = Radiobutton(self.res_frame, text="High resolution", variable=self.resolution,
+                                        value="HR", font=self.font, fg=c3, bg=c0, selectcolor=c4)
+        self.single_radio.place(relx=0.75, rely=0.6, anchor=CENTER)
 
         # ==== Settings for Calculate Method Window
         self.mode_window = PanedWindow(self.master, orient="vertical")
@@ -237,14 +246,17 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
         self.bar_label = Label(self.input_frame, text="-", font=self.font, bg=c2)
         self.bar_label.place(x=620, y=290, anchor=W)
 
-        # Run
+        # Run & Save
         self.execute_window = PanedWindow(self.master, orient="vertical")
         self.execute_frame = LabelFrame(self.execute_window, bg=c0, bd=0)
         self.execute_window.add(self.execute_frame)
         self.execute_window.place(x=0, y=735, width=800, height=65)
 
-        self.run_button = Button(self.execute_frame, text="RUN", width=15, command=self.run, font=self.font, bg="white")
-        self.run_button.place(relx=0.5, rely=0.5, anchor=CENTER)
+        self.run_button = Button(self.execute_frame, text="RUN ONLY", width=15, command=self.run, font=self.font, bg=c3)
+        self.run_button.place(relx=0.35, rely=0.5, anchor=CENTER)
+
+        self.run_button = Button(self.execute_frame, text="RUN & SAVE", width=15, command=self.run_save, font=self.font, bg=c3)
+        self.run_button.place(relx=0.65, rely=0.5, anchor=CENTER)
 
         # Global variables
         self.mag = 0
@@ -353,7 +365,7 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
 
     # change 20210324 by T-G. Ji
     def run(self):
-        res_mode = self.res_combo.get()
+        res_mode = self.resolution.get()
         wave_mode = self.wave_mode.get()
         cal_mode = self.mode.get()
         set_wave = float(self.set_wave_entry.get())
@@ -493,3 +505,8 @@ class MainGUI(Frame):  # change 20210324 by T-G. Ji: GUI renewal
                                             self.mag, self.sky, self.min_wave, self.max_wave)
             else:
                 return None
+
+    def run_save(self):  # add 20210603 Hojae
+        MainGUI.save = True
+        self.run()
+        MainGUI.save = False
