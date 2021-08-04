@@ -8,6 +8,7 @@ Modification Log:
     * 2021.04.09 - Version 0.3.0 was updated by Hojae Ahn
     * 2021.04.27 - Version 0.3.1 was updated by Mingyeong Yang
     * 2021.06.03 - Version 1.1.0 was updated by Hojae Ahn
+	*
 """
 
 from gui import *
