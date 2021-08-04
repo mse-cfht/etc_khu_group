@@ -1,0 +1,14 @@
+======================================================
+The calculation exposure time for target S/N
+
+Resolution Mode   = High Resolution
+PWV [mm]          = 1.0
+Exposure Number   = 1
+Target S/N   = 10
+
+Band	 Mag. 	 Sky 	 ExpTime [s]
+[Blue]	 18.00 	 20.70 	 413.769531
+[Green]	 18.00 	 20.70 	 276.660156
+[Red]	 18.00 	 20.70 	 97.363281
+[445.0]	 18.00 	 20.70 	 280.175781 	 (Band = Blue)
+[445.0]	 18.00 	 20.70 	 280.175781 	 (Band = Green)
