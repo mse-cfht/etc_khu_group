@@ -19,7 +19,7 @@ from parameters import *
 from scipy import interpolate
 from astropy.io import fits
 import numpy as np
-import time
+
 
 # change 20210421 by MY
 class Throughput:
@@ -63,19 +63,19 @@ class Throughput:
         self.file_green_high = fits.open(green_high_box_path)
         self.file_red_high = fits.open(red_high_box_path)
 
-        #read data (LR)
+        # read data (LR)
         self.data_blue_low = self.file_blue_low[1].data
         self.data_green_low = self.file_green_low[1].data
         self.data_red_low = self.file_red_low[1].data
         self.data_nir_low = self.file_nir_low[1].data
 
-        #read data (MR)
+        # read data (MR)
         self.data_blue_moderate = self.file_blue_moderate[1].data
         self.data_green_moderate = self.file_green_moderate[1].data
         self.data_red_moderate = self.file_red_moderate[1].data
         self.data_nir_moderate = self.file_nir_moderate[1].data
 
-        #read data (HR)
+        # read data (HR)
         self.data_blue_high = self.file_blue_high[1].data
         self.data_green_high = self.file_green_high[1].data
         self.data_red_high = self.file_red_high[1].data
@@ -113,6 +113,13 @@ class Throughput:
         self.tau_atmo = 0
         self.tau_opt = 0
         self.tau_ie = 0
+
+        self.index_order = []
+        self.tau_wave_order = []
+        self.data_tau_order = []
+
+        self.data_wave = []
+        self.data_tau = []
 
     def set_data(self, res_mode):
         """Sets the data array suitable for each resolution mode.
@@ -204,7 +211,6 @@ class Throughput:
             self.wave_blue = self.data_blue_high.field(0)
             self.wave_green = self.data_green_high.field(0)
             self.wave_red = self.data_red_high.field(0)
-            #self.wave_nir = self.data_nir_high.field(0)
 
             self.atmo_blue = []
             self.atmo_blue = np.array([self.data_blue_high.field(1),
@@ -235,6 +241,30 @@ class Throughput:
             self.sip_arr = data[:, 4]
             self.data_tau_ie = data[:, 5]
 
+            data_order = np.loadtxt("Throughput_Order_HR.dat")
+            self.index_order = data_order[:, 0]
+            self.tau_wave_order = data_order[:, 1]
+            self.data_tau_order = data_order[:, 2]
+
+    def set_data_order(self, res_mode, order):
+        if res_mode == "HR":
+            num = len(self.index_order)
+
+            count = 0
+            for i in range(num):
+                if self.index_order[i] == order:
+                    count += 1
+
+            self.data_wave = np.zeros(count)
+            self.data_tau = np.zeros(count)
+
+            k = 0
+            for i in range(num):
+                if self.index_order[i] == order:
+                    self.data_wave[k] = self.tau_wave_order[i]
+                    self.data_tau[k] = self.data_tau_order[i]
+                    k += 1
+
     def tau_atmo_blue(self, pwv):
         """Returns the atmospheric throughput in blue wavelength.
 
@@ -250,15 +280,15 @@ class Throughput:
         """
 
         if pwv == 1.0:
-            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[0, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[0, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_blue)
 
         if pwv == 2.5:
-            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[1, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[1, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_blue)
 
         if pwv == 7.5:
-            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[2, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_blue, self.atmo_blue[2, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_blue)
 
         return self.tau_atmo
@@ -267,15 +297,15 @@ class Throughput:
         """Returns the atmospheric throughput in green wavelength. """
 
         if pwv == 1.0:
-            func = interpolate.interp1d(self.wave_green, self.atmo_green[0, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_green, self.atmo_green[0, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_green)
 
         if pwv == 2.5:
-            func = interpolate.interp1d(self.wave_green, self.atmo_green[1, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_green, self.atmo_green[1, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_green)
 
         if pwv == 7.5:
-            func = interpolate.interp1d(self.wave_green, self.atmo_green[2, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_green, self.atmo_green[2, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_green)
 
         return self.tau_atmo
@@ -285,15 +315,15 @@ class Throughput:
 
 
         if pwv == 1.0:
-            func = interpolate.interp1d(self.wave_red, self.atmo_red[0, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_red, self.atmo_red[0, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_red)
 
         if pwv == 2.5:
-            func = interpolate.interp1d(self.wave_red, self.atmo_red[1, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_red, self.atmo_red[1, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_red)
 
         if pwv == 7.5:
-            func = interpolate.interp1d(self.wave_red, self.atmo_red[2, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_red, self.atmo_red[2, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_red)
 
         return self.tau_atmo
@@ -303,21 +333,20 @@ class Throughput:
 
 
         if pwv == 1.0:
-            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[0, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[0, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_nir)
 
         if pwv == 2.5:
-            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[1, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[1, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_nir)
 
         if pwv == 7.5:
-            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[2, :], kind='linear', bounds_error=False)
+            func = interpolate.interp1d(self.wave_nir, self.atmo_nir[2, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_nir)
 
         return self.tau_atmo
 
-
-    def Cal_tau_atmo(self, wave, transmission1, transmission2, transmission7, pwv):
+    def cal_tau_atmo(self, wave, transmission1, transmission2, transmission7, pwv):
         """Calculates the atmospheric throughput with parameters.
 
         This function estimates the transmission value corresponding to a specific pwv 
@@ -347,18 +376,15 @@ class Throughput:
         if pwv >= 1 and pwv <= 2.5:
             for i in np.arange(0, N_data):
                 y[i] = transmission1[i] + (pwv - 1) * (transmission2[i] - transmission1[i])
-                #if pwv >= 2 and pwv <= 4:
-                #for i in np.arange(0, N_data):
-                #y[i] = transmission2[i] + (pwv - 2) * (transmission4[i] - transmission2[i]) / (4 - 2)
         elif pwv > 2.5 and pwv <= 7.5:
             for i in np.arange(0, N_data):
                 y[i] = transmission2[i] + (pwv - 2.5) * (transmission7[i] - transmission2[i]) / (7.5 - 2.5)
         else:
-            return self.print_error
+            return print("tau_atmo calculation error occurred.")
 
         return y
 
-    def Get_tau_atmo(self, input_pwv, input_wavelength):
+    def get_tau_atmo(self, band, input_pwv, input_wavelength):
         """Return the result value for input parameters.
 
         This function returns the atmospheric throughput according to the wavelength band and pwv
@@ -375,51 +401,45 @@ class Throughput:
 
         """
 
-
-        if 350.0 <= input_wavelength < 540.0:
-
+        if band == 0:
             transmission1 = self.tau_atmo_blue(self.data_pwv[0])
             transmission2 = self.tau_atmo_blue(self.data_pwv[1])
             transmission7 = self.tau_atmo_blue(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', bounds_error=False,)
+            throughput = self.cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
-
-        if 540.0 <= input_wavelength < 715.0:
-
+        if band == 1:
             transmission1 = self.tau_atmo_green(self.data_pwv[0])
             transmission2 = self.tau_atmo_green(self.data_pwv[1])
             transmission7 = self.tau_atmo_green(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False,)
+            throughput = self.cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
-
-        if 715.0 <= input_wavelength < 960:
-
+        if band == 2:
             transmission1 = self.tau_atmo_red(self.data_pwv[0])
             transmission2 = self.tau_atmo_red(self.data_pwv[1])
             transmission7 = self.tau_atmo_red(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False,)
+            throughput = self.cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
-
-        if 960 <= input_wavelength:
-
+        if band == 3:
             transmission1 = self.tau_atmo_nir(self.data_pwv[0])
             transmission2 = self.tau_atmo_nir(self.data_pwv[1])
             transmission7 = self.tau_atmo_nir(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False,)
-
-        self.tau_atmo = func(input_wavelength)
+            throughput = self.cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
         return self.tau_atmo
 
-    def Get_tau_atmo_MR(self, input_pwv, input_wavelength):
+    def get_tau_atmo_MR(self, band, input_pwv, input_wavelength):
 
         """Return the result value for input parameters.
 
@@ -439,43 +459,45 @@ class Throughput:
                 The reason using the wavelength end range of 543, 718, 1457 for each wavelength is because the interpolation fails when there are blank between other wavelengths.
                 """
 
-        if 350.0 <= input_wavelength < 543.0:
+        if band == 0:
             transmission1_m = self.tau_atmo_blue(self.data_pwv[0])
             transmission2_m = self.tau_atmo_blue(self.data_pwv[1])
             transmission7_m = self.tau_atmo_blue(self.data_pwv[2])
 
-            throughput_m = self.Cal_tau_atmo(self.wave_blue, transmission1_m, transmission2_m, transmission7_m, input_pwv)
-            func = interpolate.interp1d(self.wave_blue, throughput_m, kind='linear', bounds_error=False,)
+            throughput_m = self.cal_tau_atmo(self.wave_blue, transmission1_m, transmission2_m, transmission7_m, input_pwv)
+            func = interpolate.interp1d(self.wave_blue, throughput_m, kind='linear', fill_value="extrapolate")
+            self.tau_atmo_m = func(input_wavelength)
 
-        if 543.0 <= input_wavelength < 718.0:
+        if band == 1:
             transmission1 = self.tau_atmo_green(self.data_pwv[0])
             transmission2 = self.tau_atmo_green(self.data_pwv[1])
             transmission7 = self.tau_atmo_green(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False,)
+            throughput = self.cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo_m = func(input_wavelength)
 
-        if 718.0 <= input_wavelength < 1457:
+        if band == 2:
             transmission1 = self.tau_atmo_red(self.data_pwv[0])
             transmission2 = self.tau_atmo_red(self.data_pwv[1])
             transmission7 = self.tau_atmo_red(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False,)
+            throughput = self.cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo_m = func(input_wavelength)
 
-        if 1457.0 <= input_wavelength:
+        if band == 3:
             transmission1 = self.tau_atmo_nir(self.data_pwv[0])
             transmission2 = self.tau_atmo_nir(self.data_pwv[1])
             transmission7 = self.tau_atmo_nir(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', bounds_error=False,)
-
-        self.tau_atmo_m = func(input_wavelength)
+            throughput = self.cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo_m = func(input_wavelength)
 
         return self.tau_atmo_m
 
-    def Get_tau_atmo_HR(self, input_pwv, input_wavelength):
+    def get_tau_atmo_HR(self, band, input_pwv, input_wavelength):
 
         """Return the result value for input parameters.
 
@@ -493,52 +515,65 @@ class Throughput:
 
                 """
 
-        if 360.0 <= input_wavelength < 440.0:
+        if band == 0:
             transmission1 = self.tau_atmo_blue(self.data_pwv[0])
             transmission2 = self.tau_atmo_blue(self.data_pwv[1])
             transmission7 = self.tau_atmo_blue(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', bounds_error=False, )
+            throughput = self.cal_tau_atmo(self.wave_blue, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_blue, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
-        if 440.0 <= input_wavelength < 620.0:
+        if band == 1:
             transmission1 = self.tau_atmo_green(self.data_pwv[0])
             transmission2 = self.tau_atmo_green(self.data_pwv[1])
             transmission7 = self.tau_atmo_green(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', bounds_error=False, )
+            throughput = self.cal_tau_atmo(self.wave_green, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_green, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
-        if 620.0 <= input_wavelength:
+        if band == 2:
             transmission1 = self.tau_atmo_red(self.data_pwv[0])
             transmission2 = self.tau_atmo_red(self.data_pwv[1])
             transmission7 = self.tau_atmo_red(self.data_pwv[2])
 
-            throughput = self.Cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
-            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', bounds_error=False, )
-
-        self.tau_atmo = func(input_wavelength)
+            throughput = self.cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
+            func = interpolate.interp1d(self.wave_red, throughput, kind='linear', fill_value="extrapolate")
+            self.tau_atmo = func(input_wavelength)
 
         return self.tau_atmo
 
+    def get_tau_order(self, wave): # Only consider to index for HR
+        """ Returns the throughput values. """
+
+        func_tau_order = interpolate.interp1d(self.data_wave, self.data_tau, kind='cubic', fill_value="extrapolate")
+        result = func_tau_order(wave)
+
+        return result
 
     def tau_opt_res(self, wave):
         """ Returns the optical values. """
 
-        func_tel_m1_zecoat = interpolate.interp1d(self.tau_wave, self.tel_m1_zecoat_arr, kind='cubic')
-        func_tel_wfc_adc = interpolate.interp1d(self.tau_wave, self.tel_wfc_adc_arr, kind='cubic')
-        func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr, kind='cubic')
-        func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr, kind='cubic')
+        func_tel_m1_zecoat = interpolate.interp1d(self.tau_wave, self.tel_m1_zecoat_arr,
+                                                  kind='cubic', fill_value="extrapolate")
+        func_tel_wfc_adc = interpolate.interp1d(self.tau_wave, self.tel_wfc_adc_arr,
+                                                kind='cubic', fill_value="extrapolate")
+        func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr,
+                                             kind='cubic', fill_value="extrapolate")
+        func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr,
+                                        kind='cubic', fill_value="extrapolate")
 
-        #LR, MR, HR has same value for ENCL, TEL_MSTR, TEL_PFHS, SIP_POSS
-        self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR * func_tel_wfc_adc(wave) \
-                         * SIP_POSS_LR * func_sip_fits(wave) * func_sip(wave)
+        # LR, MR, HR has same value for ENCL, TEL_MSTR, TEL_PFHS, SIP_POSS
+        self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR \
+                       * func_tel_wfc_adc(wave) * SIP_POSS_LR * func_sip_fits(wave) * func_sip(wave)
+
         return self.tau_opt
 
     def tau_ie_res(self, wave):
         """ Returns the injection efficiency. """
 
-        func_tau_ie = interpolate.interp1d(self.tau_wave, self.data_tau_ie, kind='cubic')
+        func_tau_ie = interpolate.interp1d(self.tau_wave, self.data_tau_ie, kind='cubic', fill_value="extrapolate")
         self.tau_ie = func_tau_ie(wave)
 
         return self.tau_ie

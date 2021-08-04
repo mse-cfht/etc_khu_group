@@ -5,29 +5,30 @@ Modification Log:
     * 2021.03.24 - Updated by Tae-Geun Ji
     * 2021.04.27 - Updated by Tae-Geun Ji
     * 2021.06.03 - Updated by Hojae Ahn
+    * 2021.06.17 - Updated by Tae-Geun Ji
 """
 
-# ==== Initial Parameter Settings
-
 # Colors
-c0 = "midnight blue" # add 20210324 by Tae-Geun Ji
+c0 = "midnight blue"
 c1 = "light blue"
 c2 = "lavender"
-c3 = "white"  # add 20210603 by Hojae Ahn
+c3 = "white"
 c4 = "black"
 
-ini_etc_title = "MSE Exposure Time Calculator"  # add 20210324 by Tae-Geun Ji
-ini_etc_version = "v1.1.0"  # change 20210427 by Tae-Geun Ji
-ini_etc_date = "20210603"  # add 20210603 by Hojae Ahn
-ini_etc_editor = "HA"   # add 20210603 by Hojae Ahn
+# Titles
+etc_title = "MSE Exposure Time Calculator"
+etc_version = "v1.2.1"
+etc_date = "20210804"
+etc_editor = "CK"
 
-ini_pwv = 1
-ini_exptime = 1200
-ini_expnumber = 3
-ini_sn = 200
-ini_min_mag = 18.0
-ini_max_mag = 26.0
-ini_wave = 482
-ini_sky = [20.7, 20.7, 20.7, 20.7, 20.7]         # Sky brightness in V-band [mag arcsec-2]
-ini_min_wave = 360
-ini_max_wave = 1320
+# Gui parameters
+pwv = 1
+exp_time = 1200
+exp_number = 3
+snr = 200
+min_mag = 18.0
+max_mag = 26.0
+wave = 482
+sky = [20.7, 20.7, 20.7, 20.7, 20.7]
+min_wave = 360
+max_wave = 1320
