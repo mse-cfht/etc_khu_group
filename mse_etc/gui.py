@@ -109,97 +109,106 @@ class MainGUI(tk.Frame):
         self.input_label = tk.Label(self.input_window, text="User Input Parameters", font=self.font_section, bg=ini.c2)
         self.input_label.place(relx=0.5, rely=0.05, anchor=tk.CENTER)
 
+        # Airmass
+        self.airmass_label = tk.Label(self.input_frame, text="Airmass = ", font=self.font, bg=ini.c2)
+        self.airmass_label.place(x=190, y=40, anchor=tk.E)
+        self.airmass_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
+                                  textvariable=tk.DoubleVar(value=ini.airmass), font=self.font)
+        self.airmass_entry.place(x=190, y=40, anchor=tk.W)
+
         # PWV
         self.pwv_label = tk.Label(self.input_frame, text="PWV [mm] = ", font=self.font, bg=ini.c2)
-        self.pwv_label.place(x=190, y=40, anchor=tk.E)
+        self.pwv_label.place(x=190, y=70, anchor=tk.E)
         self.pwv_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                   textvariable=tk.DoubleVar(value=ini.pwv), font=self.font)
-        self.pwv_entry.place(x=190, y=40, anchor=tk.W)
+        self.pwv_entry.place(x=190, y=70, anchor=tk.W)
 
         # Exposure Time
         self.exp_time_label = tk.Label(self.input_frame, text="Exp. Time [sec] = ", font=self.font, bg=ini.c2)
-        self.exp_time_label.place(x=190, y=70, anchor=tk.E)
+        self.exp_time_label.place(x=190, y=100, anchor=tk.E)
         self.exp_time_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.exp_time), font=self.font)
-        self.exp_time_entry.place(x=190, y=70, anchor=tk.W)
+        self.exp_time_entry.place(x=190, y=100, anchor=tk.W)
 
         # Number of Exposure
         self.exp_num_label = tk.Label(self.input_frame, text="Number of Exp. = ", font=self.font, bg=ini.c2)
-        self.exp_num_label.place(x=190, y=100, anchor=tk.E)
+        self.exp_num_label.place(x=190, y=130, anchor=tk.E)
         self.exp_num_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.exp_number), font=self.font)
-        self.exp_num_entry.place(x=190, y=100, anchor=tk.W)
+        self.exp_num_entry.place(x=190, y=130, anchor=tk.W)
 
         # Target S/N #add 210408 hojae
         self.target_sn_label = tk.Label(self.input_frame, text="Target S/N = ", font=self.font, bg=ini.c2)
-        self.target_sn_label.place(x=190, y=130, anchor=tk.E)
+        self.target_sn_label.place(x=190, y=160, anchor=tk.E)
         self.target_sn_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                         textvariable=tk.DoubleVar(value=ini.snr), font=self.font)
-        self.target_sn_entry.place(x=190, y=130, anchor=tk.W)
+        self.target_sn_entry.place(x=190, y=160, anchor=tk.W)
 
         # Target Magnitude (AB)
         self.magnitude_label = tk.Label(self.input_frame, text="Target Magnitude (AB):", font=self.font, bg=ini.c2)
-        self.magnitude_label.place(x=20, y=170, anchor=tk.W)
+        self.magnitude_label.place(x=80, y=200, anchor=tk.W)
 
         self.mag_blue_label = tk.Label(self.input_frame, text="Blue", font=self.font, bg=ini.c2)
-        self.mag_blue_label.place(x=20, y=200, anchor=tk.W)
+        self.mag_blue_label.place(x=80, y=230, anchor=tk.W)
         self.mag_green_label = tk.Label(self.input_frame, text="Green", font=self.font, bg=ini.c2)
-        self.mag_green_label.place(x=90, y=200, anchor=tk.W)
+        self.mag_green_label.place(x=150, y=230, anchor=tk.W)
         self.mag_red_label = tk.Label(self.input_frame, text="Red", font=self.font, bg=ini.c2)
-        self.mag_red_label.place(x=160, y=200, anchor=tk.W)
+        self.mag_red_label.place(x=220, y=230, anchor=tk.W)
         self.mag_nir_label = tk.Label(self.input_frame, text="NIR", font=self.font, bg=ini.c2)
-        self.mag_nir_label.place(x=230, y=200, anchor=tk.W)
+        self.mag_nir_label.place(x=290, y=230, anchor=tk.W)
 
         self.mag_blue_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_blue_entry.place(x=20, y=230, anchor=tk.W)
+        self.mag_blue_entry.place(x=80, y=260, anchor=tk.W)
         self.mag_green_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                         textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_green_entry.place(x=90, y=230, anchor=tk.W)
+        self.mag_green_entry.place(x=150, y=260, anchor=tk.W)
         self.mag_red_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_red_entry.place(x=160, y=230, anchor=tk.W)
+        self.mag_red_entry.place(x=220, y=260, anchor=tk.W)
         self.mag_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_nir_entry.place(x=230, y=230, anchor=tk.W)
-
+        self.mag_nir_entry.place(x=290, y=260, anchor=tk.W)
+        """
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
         self.set_wave_entry.place(x=300, y=200, anchor=tk.W)
-
+        
         self.mag_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
         self.mag_wave_entry.place(x=300, y=230, anchor=tk.W)
-
+        """
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
-        self.sky_label.place(x=20, y=290, anchor=tk.W)
+        self.sky_label.place(x=80, y=290, anchor=tk.W)
 
         self.sky_blue_label = tk.Label(self.input_frame, text="Blue", font=self.font, bg=ini.c2)
-        self.sky_blue_label.place(x=20, y=320, anchor=tk.W)
+        self.sky_blue_label.place(x=80, y=320, anchor=tk.W)
         self.sky_green_label = tk.Label(self.input_frame, text="Green", font=self.font, bg=ini.c2)
-        self.sky_green_label.place(x=90, y=320, anchor=tk.W)
+        self.sky_green_label.place(x=150, y=320, anchor=tk.W)
         self.sky_red_label = tk.Label(self.input_frame, text="Red", font=self.font, bg=ini.c2)
-        self.sky_red_label.place(x=160, y=320, anchor=tk.W)
+        self.sky_red_label.place(x=220, y=320, anchor=tk.W)
         self.sky_nir_label = tk.Label(self.input_frame, text="NIR", font=self.font, bg=ini.c2)
-        self.sky_nir_label.place(x=230, y=320, anchor=tk.W)
+        self.sky_nir_label.place(x=290, y=320, anchor=tk.W)
 
         self.sky_blue_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[0]), font=self.font)
-        self.sky_blue_entry.place(x=20, y=350, anchor=tk.W)
+        self.sky_blue_entry.place(x=80, y=350, anchor=tk.W)
         self.sky_green_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                         textvariable=tk.DoubleVar(value=ini.sky[1]), font=self.font)
-        self.sky_green_entry.place(x=90, y=350, anchor=tk.W)
+        self.sky_green_entry.place(x=150, y=350, anchor=tk.W)
         self.sky_red_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.sky[2]), font=self.font)
-        self.sky_red_entry.place(x=160, y=350, anchor=tk.W)
+        self.sky_red_entry.place(x=220, y=350, anchor=tk.W)
         self.sky_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.sky[3]), font=self.font)
-        self.sky_nir_entry.place(x=230, y=350, anchor=tk.W)
+        self.sky_nir_entry.place(x=290, y=350, anchor=tk.W)
 
+        """
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
         self.sky_wave_entry.place(x=300, y=350, anchor=tk.W)
+        """
 
         # Mag. Range (AB)
         self.mag_range_label = tk.Label(self.input_frame, text="Mag. Range (AB):", font=self.font, bg=ini.c2)
@@ -429,15 +438,15 @@ class MainGUI(tk.Frame):
         self.mag_green_entry.config(state=status)
         self.mag_red_entry.config(state=status)
         self.mag_nir_entry.config(state=status)
-        self.set_wave_entry.config(state=status)
-        self.mag_wave_entry.config(state=status)
+        #self.set_wave_entry.config(state=status)
+        #self.mag_wave_entry.config(state=status)
 
     def ui_sky_brightness(self, status):  # add 20210324 by T-G. Ji
         self.sky_blue_entry.config(state=status)
         self.sky_green_entry.config(state=status)
         self.sky_red_entry.config(state=status)
         self.sky_nir_entry.config(state=status)
-        self.sky_wave_entry.config(state=status)
+#        self.sky_wave_entry.config(state=status)
 
     def ui_mag_range(self, status):  # add 20210324 by T-G. Ji
         self.min_mag_entry.config(state=status)
@@ -448,7 +457,7 @@ class MainGUI(tk.Frame):
         self.wave_green_radio.config(state=status)
         self.wave_red_radio.config(state=status)
         self.wave_nir_radio.config(state=status)
-        self.set_wave_radio.config(state=status)
+        #self.set_wave_radio.config(state=status)
         self.min_wave_entry.config(state=status)
         self.max_wave_entry.config(state=status)
 
@@ -536,7 +545,7 @@ class MainGUI(tk.Frame):
             self.ui_sky_brightness('disable')
             self.ui_wave_range('normal')
             self.ui_mag_range('disable')
-            self.set_wave_entry.config(state='disable')
+            #self.set_wave_entry.config(state='disable')
 
             if self.resolution.get() == "HR":
                 self.ui_wave_add('normal')
@@ -557,7 +566,8 @@ class MainGUI(tk.Frame):
         res_mode = self.resolution.get()
         wave_mode = self.wave_mode.get()
         cal_mode = self.mode.get()
-        set_wave = float(self.set_wave_entry.get())
+       #set_wave = float(self.set_wave_entry.get())
+        airmass = float(self.airmass_entry.get())
         pwv = float(self.pwv_entry.get())
         exp_t = float(self.exp_time_entry.get())
         exp_n = float(self.exp_num_entry.get())
@@ -566,21 +576,21 @@ class MainGUI(tk.Frame):
         max_mag = float(self.max_mag_entry.get())
 
         mag_arr = [float(self.mag_blue_entry.get()), float(self.mag_green_entry.get()),
-                   float(self.mag_red_entry.get()), float(self.mag_nir_entry.get()),
-                   float(self.mag_wave_entry.get()), float(self.mag_wave_entry.get())]
+                   float(self.mag_red_entry.get()), float(self.mag_nir_entry.get())]
+                   #float(self.mag_wave_entry.get()), float(self.mag_wave_entry.get())]
 
         sky_arr = [float(self.sky_blue_entry.get()), float(self.sky_green_entry.get()),
-                   float(self.sky_red_entry.get()), float(self.sky_nir_entry.get()),
-                   float(self.sky_wave_entry.get()), float(self.sky_wave_entry.get())]
+                   float(self.sky_red_entry.get()), float(self.sky_nir_entry.get())]
+                   #float(self.sky_wave_entry.get()), float(self.sky_wave_entry.get())]
 
         if cal_mode == "S/N Calculation":
-            self.func.cal_signal_to_noise(res_mode, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave, True)
+            self.func.cal_signal_to_noise(res_mode, airmass, pwv, exp_t, exp_n, mag_arr, sky_arr, True)
 
         elif cal_mode == "ExpTime Calculation":
-            self.func.cal_exp_time(res_mode, pwv, target_sn, mag_arr, sky_arr, set_wave)
+            self.func.cal_exp_time(res_mode, airmass, pwv, target_sn, mag_arr, sky_arr)
 
         elif cal_mode == "S/N vs. Magnitude":
-            self.func.plot_sn_mag(res_mode, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
+            self.func.plot_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
 
         elif cal_mode == "S/N vs. Wavelength":
             if res_mode == "LR":
@@ -607,14 +617,14 @@ class MainGUI(tk.Frame):
                     self.sky = float(self.sky_nir_entry.get())
                     self.min_wave = WAVE_BAND_LR[3][0]
                     self.max_wave = WAVE_BAND_LR[3][1]
-
+                """
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-
-                self.func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, self.mag, self.sky,
+                """
+                self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
             elif res_mode == "MR":
@@ -641,14 +651,14 @@ class MainGUI(tk.Frame):
                     self.sky = float(self.sky_nir_entry.get())
                     self.min_wave = WAVE_BAND_MR[3][0]
                     self.max_wave = WAVE_BAND_MR[3][1]
-
+                """
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-
-                self.func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, self.mag, self.sky,
+                """
+                self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
             elif res_mode == "HR":
@@ -675,7 +685,7 @@ class MainGUI(tk.Frame):
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-
+                """
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
@@ -697,8 +707,8 @@ class MainGUI(tk.Frame):
                     self.func.plot_sn_wave_order(res_mode, wave_mode, order, pwv, exp_t, exp_n, self.mag, self.sky,
                                                  self.min_wave, self.max_wave)
                     return None
-
-            self.func.plot_sn_wave(res_mode, wave_mode, pwv, exp_t, exp_n, self.mag, self.sky,
+                """
+            self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                    self.min_wave, self.max_wave)
 
         else:

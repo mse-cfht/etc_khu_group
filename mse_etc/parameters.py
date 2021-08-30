@@ -28,7 +28,7 @@ N_READ_LR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2), 21.4/sqrt(7.2)]
 
 # ==== MR
 RES_MR = [4400, 6200, 6100, 6000]   # B, G, R, NIR, and Input band in MR: spectral resolution [nm]
-CTR_MR = [482, 626, 767, 1662]      # B, G, R, NIR, and Input band in MR: wavelength [nm]
+CTR_MR = [482, 626, 767]#, 1662]      # B, G, R, NIR, and Input band in MR: wavelength [nm]
 WAVE_BAND_MR = [[350, 510], [576, 700], [737, 900], [1457, 1800]]
 N_READ_MR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2), 21.4/sqrt(7.2)]
 
@@ -79,5 +79,5 @@ TAU_ATMO_HR = [1.000, 1.000, 1.000, 1.000]       # Atmospheric transmission (TBD
 
 # ==== Text Parameters: Filter Band
 BAND_LR = ['Blue', 'Green', 'Red', 'NIR', '', '']
-BAND_MR = ['Blue', 'Green', 'Red', 'NIR', '', '']
+BAND_MR = ['Blue', 'Green', 'Red', '', '', '']
 BAND_HR = ['Blue', 'Green', 'Red', '', '', '']

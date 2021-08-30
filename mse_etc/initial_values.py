@@ -17,11 +17,12 @@ c4 = "black"
 
 # Titles
 etc_title = "MSE Exposure Time Calculator"
-etc_version = "v1.2.1"
-etc_date = "20210804"
-etc_editor = "CK"
+etc_version = "v1.2.2"
+etc_date = "20210830"
+etc_editor = "TK"
 
 # Gui parameters
+airmass = 1
 pwv = 1
 exp_time = 1200
 exp_number = 3

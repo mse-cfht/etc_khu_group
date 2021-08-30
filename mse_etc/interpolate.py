@@ -197,14 +197,16 @@ class Throughput:
                                       self.data_nir_moderate.field(1),
                                       self.data_nir_moderate.field(1)])
 
-            data = np.loadtxt("Throughput_LR.dat")
 
-            self.tau_wave = data[:, 0]
-            self.tel_m1_zecoat_arr = data[:, 1]
-            self.tel_wfc_adc_arr = data[:, 2]
-            self.sip_fits_arr = data[:, 3]
-            self.sip_arr = data[:, 4]
-            self.data_tau_ie = data[:, 5]
+            data = np.loadtxt("Throughput_MR.dat")
+
+            self.tau_wave = data[2:-2, 0]
+            self.tel_m1_zecoat_arr = data[2:-2, 1]
+            self.tel_wfc_adc_arr = data[2:-2, 2]
+            self.sip_fits_arr = data[2:-2, 3]
+            self.sip_arr = data[2:-2, 4]
+            self.data_tau_ie = data[2:-2, 5]
+
 
         elif res_mode == "HR":
 
@@ -232,14 +234,16 @@ class Throughput:
                                       self.data_nir_low.field(1),
                                       self.data_nir_low.field(1)])
 
-            data = np.loadtxt("Throughput_LR.dat")
 
-            self.tau_wave = data[:, 0]
-            self.tel_m1_zecoat_arr = data[:, 1]
-            self.tel_wfc_adc_arr = data[:, 2]
-            self.sip_fits_arr = data[:, 3]
-            self.sip_arr = data[:, 4]
-            self.data_tau_ie = data[:, 5]
+            data = np.loadtxt("Throughput_HR.dat")
+
+            self.tau_wave = data[2:-1, 0]
+            self.tel_m1_zecoat_arr = data[2:-1, 1]
+            self.tel_wfc_adc_arr = data[2:-1, 2]
+            self.sip_fits_arr = data[2:-1, 3]
+            self.sip_arr = data[2:-1, 4]
+            self.data_tau_ie = data[2:-1, 5]
+
 
             data_order = np.loadtxt("Throughput_Order_HR.dat")
             self.index_order = data_order[:, 0]
@@ -384,7 +388,7 @@ class Throughput:
 
         return y
 
-    def get_tau_atmo(self, band, input_pwv, input_wavelength):
+    def get_tau_atmo_LR(self, band, input_airmass, input_pwv, input_wavelength):
         """Return the result value for input parameters.
 
         This function returns the atmospheric throughput according to the wavelength band and pwv
@@ -436,10 +440,10 @@ class Throughput:
             throughput = self.cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
             func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(input_wavelength)
-
+        self.tau_atmo = self.tau_atmo / input_airmass
         return self.tau_atmo
 
-    def get_tau_atmo_MR(self, band, input_pwv, input_wavelength):
+    def get_tau_atmo_MR(self, band, input_airmass, input_pwv, input_wavelength):
 
         """Return the result value for input parameters.
 
@@ -494,10 +498,10 @@ class Throughput:
             throughput = self.cal_tau_atmo(self.wave_nir, transmission1, transmission2, transmission7, input_pwv)
             func = interpolate.interp1d(self.wave_nir, throughput, kind='linear', fill_value="extrapolate")
             self.tau_atmo_m = func(input_wavelength)
-
+        self.tau_atmo_m = self.tau_atmo_m / input_airmass
         return self.tau_atmo_m
 
-    def get_tau_atmo_HR(self, band, input_pwv, input_wavelength):
+    def get_tau_atmo_HR(self, band, input_airmass, input_pwv, input_wavelength):
 
         """Return the result value for input parameters.
 
@@ -541,7 +545,7 @@ class Throughput:
             throughput = self.cal_tau_atmo(self.wave_red, transmission1, transmission2, transmission7, input_pwv)
             func = interpolate.interp1d(self.wave_red, throughput, kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(input_wavelength)
-
+        self.tau_atmo = self.tau_atmo / input_airmass
         return self.tau_atmo
 
     def get_tau_order(self, wave): # Only consider to index for HR
