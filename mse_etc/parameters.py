@@ -22,7 +22,7 @@ N_DARK = 0.02            # Dark current [e s-1 pix-1]
 # ==== LR
 RES_LR = [2550, 3650, 3600, 3600]  # B, G, R, NIR on LR: Spectral resolution [nm]
 CTR_LR = [482, 626, 900, 1235]     # B, G, R, NIR on LR: Central wavelength [nm]
-WAVE_BAND_LR = [[360, 560], [540, 740], [715, 985], [960, 1320]]  # B, G, R, NIR on LR: Wavelength range [nm]
+WAVE_BAND_LR = [[360, 560], [540, 740], [715, 985], [960, 1800]]  # B, G, R, NIR on LR: Wavelength range [nm]
 WAVE_OVLP_LR = [[540, 560], [715, 740], [960, 985]]               # Overlap range [nm]
 N_READ_LR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2), 21.4/sqrt(7.2)]
 

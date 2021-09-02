@@ -140,7 +140,6 @@ class Throughput:
             self.wave_red = self.data_red_low.field(0)
             self.wave_nir = self.data_nir_low.field(0)
 
-
             self.atmo_blue = []
             self.atmo_blue = np.array([self.data_blue_low.field(1),
                                      self.data_blue_low.field(2),
@@ -158,8 +157,9 @@ class Throughput:
 
             self.atmo_nir = []
             self.atmo_nir = np.array([self.data_nir_low.field(1),
-                                    self.data_nir_low.field(1),
-                                    self.data_nir_low.field(1)])
+                                    self.data_nir_low.field(2),
+                                    self.data_nir_low.field(3)])
+
 
             data = np.loadtxt("Throughput_LR.dat")
 

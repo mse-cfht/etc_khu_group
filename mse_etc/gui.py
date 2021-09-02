@@ -169,6 +169,9 @@ class MainGUI(tk.Frame):
         self.mag_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
         self.mag_nir_entry.place(x=290, y=260, anchor=tk.W)
+        
+        
+        # was commented
         """
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
@@ -178,6 +181,7 @@ class MainGUI(tk.Frame):
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
         self.mag_wave_entry.place(x=300, y=230, anchor=tk.W)
         """
+        
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
         self.sky_label.place(x=80, y=290, anchor=tk.W)
@@ -203,7 +207,8 @@ class MainGUI(tk.Frame):
         self.sky_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.sky[3]), font=self.font)
         self.sky_nir_entry.place(x=290, y=350, anchor=tk.W)
-
+        
+        # was commented
         """
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
@@ -624,6 +629,7 @@ class MainGUI(tk.Frame):
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
                 """
+                
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
@@ -708,7 +714,7 @@ class MainGUI(tk.Frame):
                                                  self.min_wave, self.max_wave)
                     return None
                 """
-            self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
+                self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                    self.min_wave, self.max_wave)
 
         else:

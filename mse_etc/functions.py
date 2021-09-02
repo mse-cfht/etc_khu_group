@@ -396,7 +396,8 @@ class Functions:
         self.tau_opt = np.zeros(num)
         self.tau_ie = np.zeros(num)
         self.tau = np.zeros(num)
-
+        print(f"num is {num}")
+        print(f"max wave is {max_wave}")
         k = 0  # band index
 
         if res_mode == "LR":
@@ -452,6 +453,7 @@ class Functions:
                 self.wave_red = np.zeros(index[2])
                 self.wave_nir = np.zeros(index[3])
 
+
                 for k in range(4):
                     count = 0
                     for i in range(num):
@@ -482,7 +484,8 @@ class Functions:
                                 self.wave_nir[count] = self.wave_grid[i]
 
                             count += 1
-
+                
+                print(self.wave_nir)
                 wave_arr = [self.wave_blue, self.wave_green, self.wave_red, self.wave_nir]
                 snr_arr = [self.snr_blue, self.snr_green, self.snr_red, self.snr_nir]
 
