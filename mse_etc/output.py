@@ -19,15 +19,75 @@ import gui
 import time
 
 
-def display_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap):
+def print_info_single(n, airmass, pwv, exp_t, exp_n, mag, sky, data):
+    print('Airmass           = %.1f' % airmass)
+    print('PWV [mm]          = %.1f' % pwv)
+    print('Exposure Time [s] = %d' % exp_t)
+    print('Exposure Number   = %d' % exp_n)
+    print(' ')
+    print('Band\t Mag. \t Sky \t S/N')
+
+    band = ['[Blue]', '[Green]', '[Red]', '[NIR]']
+
+    for i in range(n):
+        print('%s\t %.2f \t %.2f \t ' % (band[i], mag[i], sky[i]), end='')
+        if data[i] == 0.0:
+            print('N/A')
+        else:
+            print('%f' % (data[i]))
+
+
+def print_info_exp_time(n, airmass, pwv, target_sn, mag, sky, data):
+    print('Airmass           = %.1f' % airmass)
+    print('PWV [mm]          = %.1f' % pwv)
+    print('Exposure Number   = 1')
+    print('Target S/N   = %d' % target_sn)
+    print(' ')
+    print('Band\t Mag. \t Sky \t ExpTime [s]')
+
+    band = ['[Blue]', '[Green]', '[Red]', '[NIR]']
+
+    for i in range(n):
+        print('%s\t %.2f \t %.2f \t ' % (band[i], mag[i], sky[i]), end='')
+        if data[i] == 0.0:
+            print('N/A')
+        else:
+            print('%f' % (data[i]))
+
+
+def display_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, wave, overlap):
 
     if gui.MainGUI.save:
-        filename = save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap)
+        filename = save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, wave, overlap)
 
     print('==========================================================================')
     print('The calculation Signal-to-Noise from single magnitude input')
     print(' ')
 
+    if res_mode == "LR":
+        print('Resolution Mode   = Low Resolution')
+        n = len(CTR_LR)
+        print_info_single(n, airmass, pwv, exp_t, exp_n, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
+        if overlap is True:
+            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
+
+    elif res_mode == "MR":
+        print('Resolution Mode   = Moderate Resolution')
+        n = len(CTR_MR)
+        print_info_single(n, airmass, pwv, exp_t, exp_n, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_MR[3]))
+
+    elif res_mode == "HR":
+        print('Resolution Mode   = High Resolution')
+        n = len(CTR_HR)
+        print_info_single(n, airmass, pwv, exp_t, exp_n, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
+        if overlap is True:
+            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+
+
+    """
     if res_mode == "LR":
 
         print('Resolution Mode   = Low Resolution')
@@ -41,10 +101,10 @@ def display_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap
         print('[Green]\t %.2f \t %.2f \t %f' % (mag[1], sky[1], data[1]))
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
         print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
-       # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
+        # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
 
-        #if overlap is True:
-         #   print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
+        # if overlap is True:
+        #   print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
 
     elif res_mode == "MR":
 
@@ -58,8 +118,8 @@ def display_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap
         print('[Blue]\t %.2f \t %.2f \t %f' % (mag[0], sky[0], data[0]))
         print('[Green]\t %.2f \t %.2f \t %f' % (mag[1], sky[1], data[1]))
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
-       # print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
-       # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
+        # print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
+        # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
 
     elif res_mode == "HR":
 
@@ -73,16 +133,17 @@ def display_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap
         print('[Blue]\t %.2f \t %.2f \t %f' % (mag[0], sky[0], data[0]))
         print('[Green]\t %.2f \t %.2f \t %f' % (mag[1], sky[1], data[1]))
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
-       # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
+    # print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
 
-       # if overlap is True:
-        #    print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+    # if overlap is True:
+    #    print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+    """
 
     if gui.MainGUI.save:
         display_simple_text("Data file (%s.txt) is saved." % filename)
 
 
-def save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap):
+def save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, wave, overlap):
     now = time.localtime()
     filename = '%d%02d%02d_%02d%02d%02d' % (now.tm_year,now.tm_mon,now.tm_mday,now.tm_hour,now.tm_min,now.tm_sec)
     f1 = open('./user_saved_data/%s.txt' % filename, 'w')
@@ -104,10 +165,10 @@ def save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap):
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
         f1.write('[NIR]\t %.2f \t %.2f \t %f\n' % (mag[3], sky[3], data[3]))
-       # f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
 
-        #if overlap is True:
-         #   f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
+        if overlap is True:
+            f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
 
     elif res_mode == "MR":
 
@@ -121,11 +182,11 @@ def save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap):
         f1.write('[Blue]\t %.2f \t %.2f \t %f\n' % (mag[0], sky[0], data[0]))
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
-      #  f1.write('[NIR]\t %.2f \t %.2f \t %f\n' % (mag[3], sky[3], data[3]))
-      #  f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
+        f1.write('[NIR]\t %.2f \t %.2f \t %f\n' % (mag[3], sky[3], data[3]))
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
 
-       # if overlap is True:
-        #    f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_MR[5]))
+        if overlap is True:
+            f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_MR[5]))
 
     elif res_mode == "HR":
 
@@ -139,10 +200,10 @@ def save_single(res_mode, airmass, pwv, exp_t, exp_n, mag, sky, data, overlap):
         f1.write('[Blue]\t %.2f \t %.2f \t %f\n' % (mag[0], sky[0], data[0]))
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
-     #   f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
 
-      #  if overlap is True:
-       #     f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+        if overlap is True:
+            f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
 
     f1.close()
 
@@ -154,7 +215,7 @@ def display_simple_text(text):
     print(text)
 
 
-def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap):
+def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, wave, overlap):
 
     if gui.MainGUI.save:
         filename = save_exp_time(res_mode, pwv, target_sn, mag, sky, data, overlap)
@@ -163,6 +224,30 @@ def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap)
     print('The calculation exposure time for target S/N')
     print(' ')
 
+    if res_mode == "LR":
+        print('Resolution Mode   = Low Resolution')
+        n = len(CTR_LR)
+        print_info_exp_time(n, airmass, pwv, target_sn, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
+        if overlap is True:
+            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
+
+    elif res_mode == "MR":
+        print('Resolution Mode   = Moderate Resolution')
+        n = len(CTR_MR)
+        print_info_exp_time(n, airmass, pwv, target_sn, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_MR[3]))
+
+    elif res_mode == "HR":
+        print('Resolution Mode   = High Resolution')
+        n = len(CTR_HR)
+        print_info_exp_time(n, airmass, pwv, target_sn, mag, sky, data)
+        print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
+        if overlap is True:
+            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+
+
+    """
     if res_mode == "LR":
 
         print('Resolution Mode   = Low Resolution')
@@ -177,10 +262,10 @@ def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap)
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
         print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
         #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
-        """
-        if overlap is True:
-            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
-        """
+
+        #if overlap is True:
+            #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
+
     elif res_mode == "MR":
 
         print('Resolution Mode   = Moderate Resolution')
@@ -195,10 +280,10 @@ def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap)
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
         #print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
         #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
-        """
-        if overlap is True:
-            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_MR[5]))
-        """
+        
+        #if overlap is True:
+            #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_MR[5]))
+        
     elif res_mode == "HR":
 
         print('Resolution Mode   = High Resolution')
@@ -213,15 +298,16 @@ def display_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap)
         print('[Red]\t %.2f \t %.2f \t %f' % (mag[2], sky[2], data[2]))
         #print('[NIR]\t %.2f \t %.2f \t %f' % (mag[3], sky[3], data[3]))
         #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
+    
+        #if overlap is True:
+            #print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_HR[5]))
         """
-        if overlap is True:
-            print('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)' % (wave, mag[5], sky[5], data[5], BAND_HR[5]))
-        """
+
     if gui.MainGUI.save:
         display_simple_text("Data file (%s.txt) is saved." % filename)
 
 
-def save_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap):
+def save_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, wave, overlap):
     now = time.localtime()
     filename = '%d%02d%02d_%02d%02d%02d' % (now.tm_year,now.tm_mon,now.tm_mday,now.tm_hour,now.tm_min,now.tm_sec)
     f1 = open('./user_saved_data/%s.txt' % filename, 'w')
@@ -243,11 +329,11 @@ def save_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap):
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
         f1.write('[NIR]\t %.2f \t %.2f \t %f\n' % (mag[3], sky[3], data[3]))
-        #f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
-        """
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_LR[4]))
+
         if overlap is True:
             f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_LR[5]))
-        """
+
     elif res_mode == "MR":
 
         f1.write('Resolution Mode   = Moderate Resolution\n')
@@ -261,11 +347,11 @@ def save_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap):
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
        # f1.write('[NIR]\t %.2f \t %.2f \t %f\n' % (mag[3], sky[3], data[3]))
-       # f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
-        """
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_MR[4]))
+
         if overlap is True:
             f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[5], sky[5], data[5], BAND_MR[5]))
-        """
+
     elif res_mode == "HR":
 
         f1.write('Resolution Mode   = High Resolution\n')
@@ -278,11 +364,11 @@ def save_exp_time(res_mode, airmass, pwv, target_sn, mag, sky, data, overlap):
         f1.write('[Blue]\t %.2f \t %.2f \t %f\n' % (mag[0], sky[0], data[0]))
         f1.write('[Green]\t %.2f \t %.2f \t %f\n' % (mag[1], sky[1], data[1]))
         f1.write('[Red]\t %.2f \t %.2f \t %f\n' % (mag[2], sky[2], data[2]))
-       # f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
-        """
+        f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[3], sky[3], data[3], BAND_HR[3]))
+
         if overlap is True:
             f1.write('[%.1f]\t %.2f \t %.2f \t %f \t (Band = %s)\n' % (wave, mag[4], sky[4], data[4], BAND_HR[4]))
-        """
+
     f1.close()
     return filename
 
@@ -532,6 +618,7 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.xlim([min_wave, max_wave])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+
 
     elif res_mode == "MR":
 

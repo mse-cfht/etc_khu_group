@@ -11,6 +11,7 @@ Modification Log:
 
 from parameters import *
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.font as font
 import numpy as np
 import initial_values as ini
@@ -172,15 +173,15 @@ class MainGUI(tk.Frame):
         
         
         # was commented
-        """
+
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
-        self.set_wave_entry.place(x=300, y=200, anchor=tk.W)
+        self.set_wave_entry.place(x=360, y=230, anchor=tk.W)
         
         self.mag_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
-        self.mag_wave_entry.place(x=300, y=230, anchor=tk.W)
-        """
+        self.mag_wave_entry.place(x=360, y=260, anchor=tk.W)
+
         
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
@@ -209,11 +210,11 @@ class MainGUI(tk.Frame):
         self.sky_nir_entry.place(x=290, y=350, anchor=tk.W)
         
         # was commented
-        """
+
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
-        self.sky_wave_entry.place(x=300, y=350, anchor=tk.W)
-        """
+        self.sky_wave_entry.place(x=360, y=350, anchor=tk.W)
+
 
         # Mag. Range (AB)
         self.mag_range_label = tk.Label(self.input_frame, text="Mag. Range (AB):", font=self.font, bg=ini.c2)
@@ -242,31 +243,66 @@ class MainGUI(tk.Frame):
 
         self.wave_green_radio = tk.Radiobutton(self.input_frame, text="Green", variable=self.wave_mode,
                                                value="Green", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_green_radio.place(x=590, y=130, anchor=tk.W)
+        self.wave_green_radio.place(x=520, y=160, anchor=tk.W)
 
         self.wave_red_radio = tk.Radiobutton(self.input_frame, text="Red", variable=self.wave_mode,
                                              value="Red", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_red_radio.place(x=660, y=130, anchor=tk.W)
+        self.wave_red_radio.place(x=520, y=190, anchor=tk.W)
 
         self.wave_nir_radio = tk.Radiobutton(self.input_frame, text="NIR", variable=self.wave_mode,
                                              value="NIR", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_nir_radio.place(x=730, y=130, anchor=tk.W)
+        self.wave_nir_radio.place(x=520, y=220, anchor=tk.W)
 
         self.set_wave_radio = tk.Radiobutton(self.input_frame, text="", variable=self.wave_mode,
                                              value="Input Wave", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.set_wave_radio.place(x=800, y=130, anchor=tk.W)
+        self.set_wave_radio.place(x=520, y=250, anchor=tk.W)
 
         self.min_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_wave), font=self.font, bg="khaki")
-        self.min_wave_entry.place(x=830, y=130, anchor=tk.W)
+        self.min_wave_entry.place(x=550, y=250, anchor=tk.W)
 
         self.max_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.max_wave), font=self.font, bg="khaki")
-        self.max_wave_entry.place(x=910, y=130, anchor=tk.W)
+        self.max_wave_entry.place(x=630, y=250, anchor=tk.W)
 
         self.bar_label = tk.Label(self.input_frame, text="-", font=self.font, bg=ini.c2)
-        self.bar_label.place(x=890, y=130, anchor=tk.W)
+        self.bar_label.place(x=610, y=250, anchor=tk.W)
 
+        # Combobox
+        data = np.genfromtxt("Index_Order_HR.dat")[:, 2:]
+        self.wave_blue_combo_mode = tk.StringVar()
+        self.wave_blue_combo = ttk.Combobox(self.input_frame, width=16, height=8, textvariable=self.wave_blue_combo_mode,
+                                            postcommand=self.ui_wave_enable, font=self.font, state='disabled')
+        wave_blue_values = []
+        for i in range(0, 7):
+            wave_blue_values.append('B%d: %.2f - %.2f' % (i+1, data[2*i][0], data[2*i+1][1]))
+
+        self.wave_blue_combo["values"] = wave_blue_values
+        self.wave_blue_combo.current(0)
+        self.wave_blue_combo.place(x=600, y=130, anchor=tk.W)
+
+
+        self.wave_green_combo_mode = tk.StringVar()
+        self.wave_green_combo = ttk.Combobox(self.input_frame, width=16, height=13, textvariable=self.wave_green_combo_mode,
+                                             postcommand=self.ui_wave_enable, font=self.font, state='disabled')
+        wave_green_values = []
+        for i in range(0, 12):
+            wave_green_values.append('G%d: %.2f - %.2f' % (i + 1, data[2 * i + 14][0], data[2 * i + 15][1]))
+        self.wave_green_combo["values"] = wave_green_values
+        self.wave_green_combo.current(0)
+        self.wave_green_combo.place(x=600, y=160, anchor=tk.W)
+
+        self.wave_red_combo_mode = tk.StringVar()
+        self.wave_red_combo = ttk.Combobox(self.input_frame, width=16, height=10, textvariable=self.wave_red_combo_mode,
+                                           postcommand=self.ui_wave_enable, font=self.font, state='disabled')
+        wave_red_values = []
+        for i in range(0, 9):
+            wave_red_values.append('R%d: %.2f - %.2f' % (i + 1, data[2 * i + 38][0], data[2 * i + 39][1]))
+        self.wave_red_combo["values"] = wave_red_values
+        self.wave_red_combo.current(0)
+        self.wave_red_combo.place(x=600, y=190, anchor=tk.W)
+
+        """
         # Wavelength Range: B1 - B7
         self.wave_b1_radio = tk.Radiobutton(self.input_frame, text="B1", variable=self.wave_mode,
                                             value="B1", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
@@ -381,6 +417,7 @@ class MainGUI(tk.Frame):
         self.wave_r9_radio = tk.Radiobutton(self.input_frame, text="R9", variable=self.wave_mode,
                                             value="R9", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
         self.wave_r9_radio.place(x=660, y=310, anchor=tk.W)
+        """
 
         # Run & Save
         self.execute_window = tk.PanedWindow(self.master, orient="vertical")
@@ -443,15 +480,15 @@ class MainGUI(tk.Frame):
         self.mag_green_entry.config(state=status)
         self.mag_red_entry.config(state=status)
         self.mag_nir_entry.config(state=status)
-        #self.set_wave_entry.config(state=status)
-        #self.mag_wave_entry.config(state=status)
+        self.set_wave_entry.config(state=status)
+        self.mag_wave_entry.config(state=status)
 
     def ui_sky_brightness(self, status):  # add 20210324 by T-G. Ji
         self.sky_blue_entry.config(state=status)
         self.sky_green_entry.config(state=status)
         self.sky_red_entry.config(state=status)
         self.sky_nir_entry.config(state=status)
-#        self.sky_wave_entry.config(state=status)
+        self.sky_wave_entry.config(state=status)
 
     def ui_mag_range(self, status):  # add 20210324 by T-G. Ji
         self.min_mag_entry.config(state=status)
@@ -462,12 +499,12 @@ class MainGUI(tk.Frame):
         self.wave_green_radio.config(state=status)
         self.wave_red_radio.config(state=status)
         self.wave_nir_radio.config(state=status)
-        #self.set_wave_radio.config(state=status)
+        self.set_wave_radio.config(state=status)
         self.min_wave_entry.config(state=status)
         self.max_wave_entry.config(state=status)
 
         if status == 'normal':
-            if self.resolution.get() == "HR":
+            if self.resolution.get() != "LR":
                 self.wave_nir_radio.config(state='disable')
             else:
                 self.wave_nir_radio.config(state=status)
@@ -477,6 +514,11 @@ class MainGUI(tk.Frame):
                 self.max_wave_entry.config(state='disable')
 
     def ui_wave_add(self, status):  # add 20210617 by T-G. Ji
+        self.wave_blue_combo.config(state=status)
+        self.wave_green_combo.config(state=status)
+        self.wave_red_combo.config(state=status)
+
+        """
         self.wave_b1_radio.config(state=status)
         self.wave_b2_radio.config(state=status)
         self.wave_b3_radio.config(state=status)
@@ -507,6 +549,7 @@ class MainGUI(tk.Frame):
         self.wave_r7_radio.config(state=status)
         self.wave_r8_radio.config(state=status)
         self.wave_r9_radio.config(state=status)
+        """
 
     def ui_enable(self):  # add 20210324 by T-G. Ji
 
@@ -550,7 +593,7 @@ class MainGUI(tk.Frame):
             self.ui_sky_brightness('disable')
             self.ui_wave_range('normal')
             self.ui_mag_range('disable')
-            #self.set_wave_entry.config(state='disable')
+            self.set_wave_entry.config(state='disable')
 
             if self.resolution.get() == "HR":
                 self.ui_wave_add('normal')
@@ -566,12 +609,16 @@ class MainGUI(tk.Frame):
             self.min_wave_entry.config(state='disable')
             self.max_wave_entry.config(state='disable')
 
+
     # change 20210324 by T-G. Ji
     def run(self):
         res_mode = self.resolution.get()
         wave_mode = self.wave_mode.get()
+        wave_blue_mode = self.wave_blue_combo_mode.get()[:2]
+        wave_green_mode = self.wave_green_combo_mode.get()[:2]
+        wave_red_mode = self.wave_red_combo_mode.get()[:2]
         cal_mode = self.mode.get()
-       #set_wave = float(self.set_wave_entry.get())
+        set_wave = float(self.set_wave_entry.get())
         airmass = float(self.airmass_entry.get())
         pwv = float(self.pwv_entry.get())
         exp_t = float(self.exp_time_entry.get())
@@ -581,18 +628,18 @@ class MainGUI(tk.Frame):
         max_mag = float(self.max_mag_entry.get())
 
         mag_arr = [float(self.mag_blue_entry.get()), float(self.mag_green_entry.get()),
-                   float(self.mag_red_entry.get()), float(self.mag_nir_entry.get())]
-                   #float(self.mag_wave_entry.get()), float(self.mag_wave_entry.get())]
+                   float(self.mag_red_entry.get()), float(self.mag_nir_entry.get()),
+                   float(self.mag_wave_entry.get()), float(self.mag_wave_entry.get())]
 
         sky_arr = [float(self.sky_blue_entry.get()), float(self.sky_green_entry.get()),
-                   float(self.sky_red_entry.get()), float(self.sky_nir_entry.get())]
-                   #float(self.sky_wave_entry.get()), float(self.sky_wave_entry.get())]
+                   float(self.sky_red_entry.get()), float(self.sky_nir_entry.get()),
+                   float(self.sky_wave_entry.get()), float(self.sky_wave_entry.get())]
 
         if cal_mode == "S/N Calculation":
-            self.func.cal_signal_to_noise(res_mode, airmass, pwv, exp_t, exp_n, mag_arr, sky_arr, True)
+            self.func.cal_signal_to_noise(res_mode, airmass, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave, True)
 
         elif cal_mode == "ExpTime Calculation":
-            self.func.cal_exp_time(res_mode, airmass, pwv, target_sn, mag_arr, sky_arr)
+            self.func.cal_exp_time(res_mode, airmass, pwv, target_sn, mag_arr, sky_arr, set_wave)
 
         elif cal_mode == "S/N vs. Magnitude":
             self.func.plot_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
@@ -622,13 +669,13 @@ class MainGUI(tk.Frame):
                     self.sky = float(self.sky_nir_entry.get())
                     self.min_wave = WAVE_BAND_LR[3][0]
                     self.max_wave = WAVE_BAND_LR[3][1]
-                """
+
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-                """
+
                 
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
@@ -652,49 +699,61 @@ class MainGUI(tk.Frame):
                     self.min_wave = WAVE_BAND_MR[2][0]
                     self.max_wave = WAVE_BAND_MR[2][1]
 
-                elif wave_mode == "NIR":
-                    self.mag = float(self.mag_nir_entry.get())
-                    self.sky = float(self.sky_nir_entry.get())
-                    self.min_wave = WAVE_BAND_MR[3][0]
-                    self.max_wave = WAVE_BAND_MR[3][1]
-                """
+
+                #elif wave_mode == "NIR":
+                    #self.mag = float(self.mag_nir_entry.get())
+                    #self.sky = float(self.sky_nir_entry.get())
+                    #self.min_wave = WAVE_BAND_MR[3][0]
+                    #self.max_wave = WAVE_BAND_MR[3][1]
+
+
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-                """
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
             elif res_mode == "HR":
                 if wave_mode == "Blue":
-                    self.mag = float(self.mag_blue_entry.get())
-                    self.sky = float(self.sky_blue_entry.get())
-                    self.min_wave = WAVE_BAND_HR[0][0]
-                    self.max_wave = WAVE_BAND_HR[0][1]
+                    #if wave_blue_mode == "Blue":
+                    #    self.mag = float(self.mag_blue_entry.get())
+                    #    self.sky = float(self.sky_blue_entry.get())
+                    #    self.min_wave = WAVE_BAND_HR[0][0]
+                    #    self.max_wave = WAVE_BAND_HR[0][1]
+                    #else:
+                    wave_mode = wave_blue_mode
 
                 elif wave_mode == "Green":
-                    self.mag = float(self.mag_green_entry.get())
-                    self.sky = float(self.sky_green_entry.get())
-                    self.min_wave = WAVE_BAND_HR[1][0]
-                    self.max_wave = WAVE_BAND_HR[1][1]
+                    #if wave_green_mode == "Green":
+                    #    self.mag = float(self.mag_green_entry.get())
+                    #    self.sky = float(self.sky_green_entry.get())
+                    #    self.min_wave = WAVE_BAND_HR[1][0]
+                    #    self.max_wave = WAVE_BAND_HR[1][1]
+
+                    #else:
+                    wave_mode = wave_green_mode
 
                 elif wave_mode == "Red":
-                    self.mag = float(self.mag_red_entry.get())
-                    self.sky = float(self.sky_red_entry.get())
-                    self.min_wave = WAVE_BAND_HR[2][0]
-                    self.max_wave = WAVE_BAND_HR[2][1]
+                    #if wave_red_mode == "Red":
+                    #    self.mag = float(self.mag_red_entry.get())
+                    #    self.sky = float(self.sky_red_entry.get())
+                    #    self.min_wave = WAVE_BAND_HR[2][0]
+                    #    self.max_wave = WAVE_BAND_HR[2][1]
+                    #else:
+                    wave_mode = wave_red_mode
 
                 elif wave_mode == "Input Wave":
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
-                """
-                else:
-                    self.mag = float(self.mag_wave_entry.get())
-                    self.sky = float(self.sky_wave_entry.get())
+
+                if (wave_mode != "Blue") and (wave_mode != "Green") and (wave_mode != "Red") and (wave_mode != "Input Wave"):
+                    self.mag = float(self.mag_blue_entry.get())
+                    self.sky = float(self.sky_blue_entry.get())
 
                     self.min_wave = np.zeros(2)
                     self.max_wave = np.zeros(2)
@@ -710,10 +769,10 @@ class MainGUI(tk.Frame):
 
                             break
 
-                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, pwv, exp_t, exp_n, self.mag, self.sky,
+                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                                  self.min_wave, self.max_wave)
                     return None
-                """
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                    self.min_wave, self.max_wave)
 
