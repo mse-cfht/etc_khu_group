@@ -414,6 +414,7 @@ class Functions:
 
             if wave_mode != "Input Wave":
                 for i in range(num):
+                    print(self.wave_grid[i])
                     self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
                     self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
                     self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])

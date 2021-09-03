@@ -68,12 +68,13 @@ for l in pwv:
     row_green1 = data1[0:37463] #11443:28590
     row_red1 = data1[0:47224]
 
-#    nlen1 = len(row_red1)
-#    data_wave1 = np.zeros(nlen1)
-#    data_atmo1 = np.zeros(nlen1)
-#    for i in range(0, nlen1):
-#        data_wave1[i] = row_red1[i][0]
-#        data_atmo1[i] = row_red1[i][1]
+    nlen1 = len(row_red1)
+    data_wave1 = np.zeros(nlen1)
+    data_atmo1 = np.zeros(nlen1)
+    for i in range(0, nlen1):
+        data_wave1[i] = row_red1[i][0]
+        data_atmo1[i] = row_red1[i][1]
+
     for k in wave:
 
         if k == 400.0:
@@ -137,7 +138,7 @@ for l in pwv:
                     index_start = s
                     break
 
-        print(data2[1][0], l, k, index_start, index_end)
+        # print(data2[1][0], l, k, index_start, index_end)
 
         #distinguish wavelength Blue/Green/Red/NIR
         if k == 400:
@@ -156,7 +157,7 @@ for l in pwv:
         """
 
         nlen2 = len(row_data)
-
+        print(nlen1)
         print(nlen2)
         data_wave2 = np.zeros(nlen2)
         data_atmo2 = np.zeros(nlen2)
