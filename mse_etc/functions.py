@@ -11,13 +11,16 @@ Modification Log:
     * 2021.06.03 - Updated by Hojae Ahn
     * 2021.06.17 - Updated by Tae-Geun Ji
     * 2021.08.04 - Updated by Changgon Kim
+    * 2021.09.06 - Updated by Changgon Kim
 """
 
-from parameters import *
 from math import sqrt
+
+import numpy as np
+
 import interpolate
 import output
-import numpy as np
+from parameters import *
 
 
 class Functions:
@@ -411,8 +414,10 @@ class Functions:
         self.tau_opt = np.zeros(num)
         self.tau_ie = np.zeros(num)
         self.tau = np.zeros(num)
-        print(f"num is {num}")
-        print(f"max wave is {max_wave}")
+        
+        #added by CK 20210903
+        self.sky_bg_te = np.zeros(num)
+        
         k = 0  # band index
 
         if res_mode == "LR":
@@ -422,25 +427,31 @@ class Functions:
                 k = 1
             elif wave_mode == "Red":
                 k = 2
-            #elif wave_mode == "NIR":
-                #k = 3
+            elif wave_mode == "NIR":
+                k = 3
             else:
                 pass
 
             if wave_mode != "Input Wave":
                 for i in range(num):
-                    print(self.wave_grid[i])
                     self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
                     self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
                     self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                     self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
+                #added by CK 20210903
                 for i in range(num):
+                    tel_data = self.tau_func.telluric_emission(self.wave_grid[i])
+                    self.sky_bg_te[i] = exp_t * exp_n * A_TEL * self.tau[i] * tel_data * (206265 ** 2) 
+                
+                for i in range(num):
+                    # remove tau ie for the background -> 
                     self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                      * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
                     self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                      * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
-                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_LR[k] ** 2))
+                                    
+                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * (exp_t * N_DARK + N_READ_LR[k] ** 2))
                     self.snr[i] = self.signal[i] / self.noise[i]
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
@@ -463,12 +474,12 @@ class Functions:
                 self.snr_blue = np.zeros(index[0])
                 self.snr_green = np.zeros(index[1])
                 self.snr_red = np.zeros(index[2])
-                #self.snr_nir = np.zeros(index[3])
+                self.snr_nir = np.zeros(index[3])
 
                 self.wave_blue = np.zeros(index[0])
                 self.wave_green = np.zeros(index[1])
                 self.wave_red = np.zeros(index[2])
-                #self.wave_nir = np.zeros(index[3])
+                self.wave_nir = np.zeros(index[3])
 
 
                 for k in range(3):
@@ -496,13 +507,12 @@ class Functions:
                             elif k == 2:
                                 self.snr_red[count] = self.signal[i] / self.noise[i]
                                 self.wave_red[count] = self.wave_grid[i]
-                            #else:
-                                #self.snr_nir[count] = self.signal[i] / self.noise[i]
-                                #self.wave_nir[count] = self.wave_grid[i]
+                            else:
+                                self.snr_nir[count] = self.signal[i] / self.noise[i]
+                                self.wave_nir[count] = self.wave_grid[i]
 
                             count += 1
                 
-                print(self.wave_nir)
                 wave_arr = [self.wave_blue, self.wave_green, self.wave_red, self.wave_nir]
                 snr_arr = [self.snr_blue, self.snr_green, self.snr_red, self.snr_nir]
 
@@ -592,9 +602,6 @@ class Functions:
                                 self.wave_nir[count] = self.wave_grid[i]
 
                             count += 1
-
-                #wave_arr = [self.wave_blue, self.wave_green, self.wave_red, self.wave_nir]
-                #snr_arr = [self.snr_blue, self.snr_green, self.snr_red, self.snr_nir]
 
                 wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
                 snr_arr = [self.snr_blue, self.snr_green, self.snr_red]

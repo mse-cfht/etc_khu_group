@@ -11,12 +11,14 @@ Modification Log:
     * 2021.06.03 - Updated by Hojae Ahn
 """
 
-from parameters import *
-from pylab import *
-import initial_values as ini
-import matplotlib.pyplot as plt
-import gui
 import time
+
+import matplotlib.pyplot as plt
+from pylab import *
+
+import gui
+import initial_values as ini
+from parameters import *
 
 
 def print_info_single(n, airmass, pwv, exp_t, exp_n, mag, sky, data):

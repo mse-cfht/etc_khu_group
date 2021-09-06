@@ -4,9 +4,7 @@ Created on Jan 19, 2020
 @Author: Tae-Geun Ji and Soojong PAK
 """
 
-from math import pi
-from math import sqrt
-
+from math import pi, sqrt
 
 # ==== Physical Constants
 C = 299792500            # Speed of light [m s-1]

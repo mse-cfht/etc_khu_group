@@ -1,10 +1,11 @@
-from astropy.io import fits
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
-from scipy import interpolate
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.table import Table
 from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.convolution import Box1DKernel, Gaussian1DKernel, convolve
+from astropy.io import fits
+from astropy.table import Table
+from scipy import interpolate
 
 """
 

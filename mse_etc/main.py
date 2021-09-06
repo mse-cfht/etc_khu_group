@@ -13,8 +13,9 @@ Modification Log:
 """
 
 from tkinter import Tk
-from gui import MainGUI
+
 import initial_values as ini
+from gui import MainGUI
 
 if __name__ == '__main__':
 

@@ -9,13 +9,15 @@ Modification Log:
     * 2021.06.17 - Updated by Tae-Geun Ji
 """
 
-from parameters import *
 import tkinter as tk
-import tkinter.ttk as ttk
 import tkinter.font as font
+import tkinter.ttk as ttk
+
 import numpy as np
-import initial_values as ini
+
 import functions
+import initial_values as ini
+from parameters import *
 
 
 class MainGUI(tk.Frame):

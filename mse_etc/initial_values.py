@@ -6,6 +6,7 @@ Modification Log:
     * 2021.04.27 - Updated by Tae-Geun Ji
     * 2021.06.03 - Updated by Hojae Ahn
     * 2021.06.17 - Updated by Tae-Geun Ji
+    * 2021.09.06 - Updated by Changgon Kim
 """
 
 # Colors
@@ -17,9 +18,9 @@ c4 = "black"
 
 # Titles
 etc_title = "MSE Exposure Time Calculator"
-etc_version = "v1.2.2"
-etc_date = "20210830"
-etc_editor = "TK"
+etc_version = "v1.2.3"
+etc_date = "20210906"
+etc_editor = "CK"
 
 # Gui parameters
 airmass = 1

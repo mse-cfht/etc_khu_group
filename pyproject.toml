@@ -10,6 +10,7 @@ numpy = "1.19.5"
 scipy = "1.6.1"
 astropy = "4.2.1"
 matplotlib = "3.3.3"
+isort = "^5.9.3"
 
 [tool.poetry.dev-dependencies]
 

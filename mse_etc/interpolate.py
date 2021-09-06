@@ -13,12 +13,15 @@ Modification Log:
     * 2020.03.29 - Updated by Tae-Geun Ji
     * 2021.04.21 - Updated by Mingyoeng Yang
     * 2021.04.26 - Updated by Mingyeong Yang
+    * 2021.09.06 - Updated by Changgon Kim
 """
 
-from parameters import *
-from scipy import interpolate
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
+from scipy import interpolate
+
+from convolution_OH import TelluricData
+from parameters import *
 
 
 # change 20210421 by MY
@@ -29,6 +32,9 @@ class Throughput:
 
         print('...... Reading skytable for atmospheric throughput calculation.')
 
+        # Adding the telluric emission convolution data
+        self.data_instance = TelluricData()
+         
         # Atmospheric transmission data for low resolution
         blue_low_box_path = 'SKY/MSE_AM1_box_blue.fits'
         green_low_box_path = 'SKY/MSE_AM1_box_green.fits'
@@ -46,6 +52,9 @@ class Throughput:
         green_high_box_path = 'SKY/MSE_AM1_box_green_HR.fits'
         red_high_box_path = 'SKY/MSE_AM1_box_red_HR.fits'
 
+        # Telluric emission data for LR
+        nir_low_tel_path = 'data/result_MSE_OH_data_LR.fits'
+        
         # read fits files and set data (LR)
         self.file_blue_low = fits.open(blue_low_box_path)
         self.file_green_low = fits.open(green_low_box_path)
@@ -63,6 +72,9 @@ class Throughput:
         self.file_green_high = fits.open(green_high_box_path)
         self.file_red_high = fits.open(red_high_box_path)
 
+        # read fits file and set data (LR-TEL_EMISSION)
+        self.file_nir_low_tel = fits.open(nir_low_tel_path)
+        
         # read data (LR)
         self.data_blue_low = self.file_blue_low[1].data
         self.data_green_low = self.file_green_low[1].data
@@ -80,6 +92,9 @@ class Throughput:
         self.data_green_high = self.file_green_high[1].data
         self.data_red_high = self.file_red_high[1].data
 
+        # read data (LR-TEL_EMISSION)
+        self.data_nir_low_tel = self.file_nir_low_tel[1].data
+        
         # close files
         self.file_blue_low.close()
         self.file_green_low.close()
@@ -97,10 +112,16 @@ class Throughput:
         self.file_green_high.close()
         self.file_red_high.close()
 
+        # close files
+        self.file_nir_low_tel.close()
+        
         self.atmo_blue = []
         self.atmo_green = []
         self.atmo_red = []
         self.atmo_nir = []
+        
+        # added by CK 20210903
+        self.sky_bg_te = []
 
         self.tau_wave = []
         self.tel_m1_zecoat_arr = []
@@ -140,6 +161,9 @@ class Throughput:
             self.wave_red = self.data_red_low.field(0)
             self.wave_nir = self.data_nir_low.field(0)
 
+            # added by CK 20210903
+            self.tel_wave = self.data_nir_low_tel.field(0)
+            
             self.atmo_blue = []
             self.atmo_blue = np.array([self.data_blue_low.field(1),
                                      self.data_blue_low.field(2),
@@ -581,3 +605,15 @@ class Throughput:
         self.tau_ie = func_tau_ie(wave)
 
         return self.tau_ie
+    
+    # added by CK 20210903
+    def telluric_emission(self, wave):
+        """Returns the telluric emission data"""
+        
+        func_tel_em = self.data_instance.func
+        if wave >= 1400 and wave <= 1800:
+            self.sky_bg_te = func_tel_em(wave)
+        else:
+            self.sky_bg_te = 0.0        
+        
+        return self.sky_bg_te

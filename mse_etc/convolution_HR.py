@@ -1,10 +1,17 @@
-from astropy.io import fits
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
-from scipy import interpolate
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.table import Table
+"""ESO sky model data convolution of MSE ETC.
+
+Modification Log:
+    * 2021.09.06 - Updated by Changgon Kim
+"""
+
 from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.convolution import Box1DKernel, Gaussian1DKernel, convolve
+from astropy.io import fits
+from astropy.table import Table
+from scipy import interpolate
 
 """
 
