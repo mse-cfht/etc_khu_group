@@ -149,73 +149,73 @@ class MainGUI(tk.Frame):
 
         # Target Magnitude (AB)
         self.magnitude_label = tk.Label(self.input_frame, text="Target Magnitude (AB):", font=self.font, bg=ini.c2)
-        self.magnitude_label.place(x=80, y=200, anchor=tk.W)
+        self.magnitude_label.place(x=60, y=200, anchor=tk.W)
 
         self.mag_blue_label = tk.Label(self.input_frame, text="Blue", font=self.font, bg=ini.c2)
-        self.mag_blue_label.place(x=80, y=230, anchor=tk.W)
+        self.mag_blue_label.place(x=100, y=230, anchor=tk.W)
         self.mag_green_label = tk.Label(self.input_frame, text="Green", font=self.font, bg=ini.c2)
-        self.mag_green_label.place(x=150, y=230, anchor=tk.W)
+        self.mag_green_label.place(x=100, y=260, anchor=tk.W)
         self.mag_red_label = tk.Label(self.input_frame, text="Red", font=self.font, bg=ini.c2)
-        self.mag_red_label.place(x=220, y=230, anchor=tk.W)
+        self.mag_red_label.place(x=100, y=290, anchor=tk.W)
         self.mag_nir_label = tk.Label(self.input_frame, text="NIR", font=self.font, bg=ini.c2)
-        self.mag_nir_label.place(x=290, y=230, anchor=tk.W)
+        self.mag_nir_label.place(x=100, y=320, anchor=tk.W)
 
         self.mag_blue_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_blue_entry.place(x=80, y=260, anchor=tk.W)
+        self.mag_blue_entry.place(x=160, y=230, anchor=tk.W)
         self.mag_green_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                         textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_green_entry.place(x=150, y=260, anchor=tk.W)
+        self.mag_green_entry.place(x=160, y=260, anchor=tk.W)
         self.mag_red_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_red_entry.place(x=220, y=260, anchor=tk.W)
+        self.mag_red_entry.place(x=160, y=290, anchor=tk.W)
         self.mag_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
-        self.mag_nir_entry.place(x=290, y=260, anchor=tk.W)
+        self.mag_nir_entry.place(x=160, y=320, anchor=tk.W)
         
         
         # was commented
 
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
-        self.set_wave_entry.place(x=360, y=230, anchor=tk.W)
+        self.set_wave_entry.place(x=100, y=350, anchor=tk.W)
         
         self.mag_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
-        self.mag_wave_entry.place(x=360, y=260, anchor=tk.W)
+        self.mag_wave_entry.place(x=160, y=350, anchor=tk.W)
 
         
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
-        self.sky_label.place(x=80, y=290, anchor=tk.W)
+        self.sky_label.place(x=260, y=200, anchor=tk.W)
 
         self.sky_blue_label = tk.Label(self.input_frame, text="Blue", font=self.font, bg=ini.c2)
-        self.sky_blue_label.place(x=80, y=320, anchor=tk.W)
+        self.sky_blue_label.place(x=260, y=230, anchor=tk.W)
         self.sky_green_label = tk.Label(self.input_frame, text="Green", font=self.font, bg=ini.c2)
-        self.sky_green_label.place(x=150, y=320, anchor=tk.W)
+        self.sky_green_label.place(x=260, y=260, anchor=tk.W)
         self.sky_red_label = tk.Label(self.input_frame, text="Red", font=self.font, bg=ini.c2)
-        self.sky_red_label.place(x=220, y=320, anchor=tk.W)
+        self.sky_red_label.place(x=260, y=290, anchor=tk.W)
         self.sky_nir_label = tk.Label(self.input_frame, text="NIR", font=self.font, bg=ini.c2)
-        self.sky_nir_label.place(x=290, y=320, anchor=tk.W)
+        self.sky_nir_label.place(x=260, y=320, anchor=tk.W)
 
         self.sky_blue_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[0]), font=self.font)
-        self.sky_blue_entry.place(x=80, y=350, anchor=tk.W)
+        self.sky_blue_entry.place(x=320, y=230, anchor=tk.W)
         self.sky_green_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                         textvariable=tk.DoubleVar(value=ini.sky[1]), font=self.font)
-        self.sky_green_entry.place(x=150, y=350, anchor=tk.W)
+        self.sky_green_entry.place(x=320, y=260, anchor=tk.W)
         self.sky_red_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.sky[2]), font=self.font)
-        self.sky_red_entry.place(x=220, y=350, anchor=tk.W)
+        self.sky_red_entry.place(x=320, y=290, anchor=tk.W)
         self.sky_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.sky[3]), font=self.font)
-        self.sky_nir_entry.place(x=290, y=350, anchor=tk.W)
+        self.sky_nir_entry.place(x=320, y=320, anchor=tk.W)
         
         # was commented
 
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
-        self.sky_wave_entry.place(x=360, y=350, anchor=tk.W)
+        self.sky_wave_entry.place(x=320, y=350, anchor=tk.W)
 
 
         # Mag. Range (AB)
