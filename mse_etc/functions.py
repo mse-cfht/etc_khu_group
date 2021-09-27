@@ -21,12 +21,14 @@ import numpy as np
 import interpolate
 import output
 from parameters import *
+from copy import deepcopy
 
 
 class Functions:
 
     def __init__(self):
 
+        self.snr_arr = [[], []]
         self.res = []
         self.wave = []
         self.n_read = []
@@ -192,7 +194,7 @@ class Functions:
             elif res_mode == "HR":
                 self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(i, airmass, pwv, self.wave[i])
 
-            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i])
+            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave[i])
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -360,7 +362,7 @@ class Functions:
                 self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(i, airmass, pwv, self.wave[i])
 
         for i in range(self.num):
-            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i])
+            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave[i])
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -409,7 +411,7 @@ class Functions:
         self.sky_bg = np.zeros(num)
         self.signal = np.zeros(num)
         self.noise = np.zeros(num)
-        self.snr = np.zeros(num)
+        self.snr = np.zeros(shape=(2, num))
         self.tau_atmo = np.zeros(num)
         self.tau_opt = np.zeros(num)
         self.tau_ie = np.zeros(num)
@@ -435,7 +437,7 @@ class Functions:
             if wave_mode != "Input Wave":
                 for i in range(num):
                     self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
-                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
+                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
                     self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                     self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -452,16 +454,16 @@ class Functions:
                                      * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
                                     
                     self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * (exp_t * N_DARK + N_READ_LR[k] ** 2))
-                    self.snr[i] = self.signal[i] / self.noise[i]
+                    self.snr[0][i] = self.signal[i] / self.noise[i]
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
                                        min_wave, max_wave, self.snr, self.wave_grid)
 
             else:
-                #index = [0, 0, 0, 0]
-                index = [0, 0, 0]
+                index = [0, 0, 0, 0]
+                #index = [0, 0, 0]
 
-                for k in range(3):
+                for k in range(4):
                     count = 0
                     for i in range(num):
                         if WAVE_BAND_LR[k][0] <= self.wave_grid[i] <= WAVE_BAND_LR[k][1]:
@@ -482,12 +484,12 @@ class Functions:
                 self.wave_nir = np.zeros(index[3])
 
 
-                for k in range(3):
+                for k in range(4):
                     count = 0
                     for i in range(num):
                         if WAVE_BAND_LR[k][0] <= self.wave_grid[i] <= WAVE_BAND_LR[k][1]:
                             self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
-                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
+                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
                             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -532,27 +534,32 @@ class Functions:
                 pass
 
             if wave_mode != "Input Wave":
-                for i in range(num):
-                    self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
-                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
-                    self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
-                    self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
+                with_grating = 0
+                while with_grating <= 1:
+                    for i in range(num):
+                        self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
+                        self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
+                        self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
+                        self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
-                for i in range(num):
-                    self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * sky) / (h * RES_MR[k])
-                    self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
-                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_MR[k] ** 2))
-                    self.snr[i] = self.signal[i] / self.noise[i]
+                    for i in range(num):
+                        self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                         * 10.0 ** (-0.4 * sky) / (h * RES_MR[k])
+                        self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                         * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
+                        self.noise[i] = sqrt(
+                            self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_MR[k] ** 2))
+                        self.snr[with_grating][i] = self.signal[i] / self.noise[i]
+
+                    with_grating += 1
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
                                        min_wave, max_wave, self.snr, self.wave_grid)
 
             else:
-                index = [0, 0, 0, 0]
+                index = [0, 0, 0]
 
-                for k in range(4):
+                for k in range(3):
                     count = 0
                     for i in range(num):
                         if WAVE_BAND_MR[k][0] <= self.wave_grid[i] <= WAVE_BAND_MR[k][1]:
@@ -562,52 +569,57 @@ class Functions:
 
                     index[k] = count
 
+
                 self.snr_blue = np.zeros(index[0])
                 self.snr_green = np.zeros(index[1])
                 self.snr_red = np.zeros(index[2])
-                self.snr_nir = np.zeros(index[3])
+                #self.snr_nir = np.zeros(index[3])
 
                 self.wave_blue = np.zeros(index[0])
                 self.wave_green = np.zeros(index[1])
                 self.wave_red = np.zeros(index[2])
-                self.wave_nir = np.zeros(index[3])
+                #self.wave_nir = np.zeros(index[3])
 
-                for k in range(4):
-                    count = 0
-                    for i in range(num):
-                        if WAVE_BAND_MR[k][0] <= self.wave_grid[i] <= WAVE_BAND_MR[k][1]:
-                            self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
-                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
-                            self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
-                            self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
+                with_grating = 0
+                while with_grating <= 1:
+                    for k in range(3):
+                        count = 0
+                        for i in range(num):
+                            if WAVE_BAND_MR[k][0] <= self.wave_grid[i] <= WAVE_BAND_MR[k][1]:
+                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
+                                self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
+                                self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
+                                self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
-                            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                             * 10.0 ** (-0.4 * sky) / (h * RES_MR[k])
-                            self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                             * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
-                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
-                                                 * (exp_t * N_DARK + N_READ_MR[k] ** 2))
+                                self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                                 * 10.0 ** (-0.4 * sky) / (h * RES_MR[k])
+                                self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                                 * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
+                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                                                     * (exp_t * N_DARK + N_READ_MR[k] ** 2))
 
-                            if k == 0:
-                                self.snr_blue[count] = self.signal[i] / self.noise[i]
-                                self.wave_blue[count] = self.wave_grid[i]
-                            elif k == 1:
-                                self.snr_green[count] = self.signal[i] / self.noise[i]
-                                self.wave_green[count] = self.wave_grid[i]
-                            elif k == 2:
-                                self.snr_red[count] = self.signal[i] / self.noise[i]
-                                self.wave_red[count] = self.wave_grid[i]
-                            else:
-                                self.snr_nir[count] = self.signal[i] / self.noise[i]
-                                self.wave_nir[count] = self.wave_grid[i]
+                                if k == 0:
+                                    self.snr_blue[count] = self.signal[i] / self.noise[i]
+                                    self.wave_blue[count] = self.wave_grid[i]
+                                elif k == 1:
+                                    self.snr_green[count] = self.signal[i] / self.noise[i]
+                                    self.wave_green[count] = self.wave_grid[i]
+                                elif k == 2:
+                                    self.snr_red[count] = self.signal[i] / self.noise[i]
+                                    self.wave_red[count] = self.wave_grid[i]
+                                else:
+                                    self.snr_nir[count] = self.signal[i] / self.noise[i]
+                                    self.wave_nir[count] = self.wave_grid[i]
 
-                            count += 1
+                                count += 1
 
-                wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
-                snr_arr = [self.snr_blue, self.snr_green, self.snr_red]
+                    wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
+                    snr_arr = [self.snr_blue, self.snr_green, self.snr_red]
+                    self.snr_arr[with_grating] = deepcopy(snr_arr)
+                    with_grating += 1
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
-                                       min_wave, max_wave, snr_arr, wave_arr)
+                                       min_wave, max_wave, self.snr_arr, wave_arr)
 
         elif res_mode == "HR":
             if wave_mode == "Blue":
@@ -620,23 +632,30 @@ class Functions:
                 pass
 
             if wave_mode != "Input Wave":
-                for i in range(num):
-                    self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
-                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
-                    self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
-                    self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
+                pass
+                """
+                with_grating = 0
+                while with_grating <= 1:
+                    for i in range(num):
+                        self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
+                        self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
+                        self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
+                        self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
-                for i in range(num):
-                    self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
-                    self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_HR[k] ** 2))
-                    self.snr[i] = self.signal[i] / self.noise[i]
+                    for i in range(num):
+                        self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                         * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
+                        self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                         * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
+                        self.noise[i] = sqrt(
+                            self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_HR[k] ** 2))
+                        self.snr[with_grating][i] = self.signal[i] / self.noise[i]
+
+                    with_grating += 1
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
                                        min_wave, max_wave, self.snr, self.wave_grid)
-
+                """
             else:
                 index = [0, 0, 0]
 
@@ -658,39 +677,45 @@ class Functions:
                 self.wave_green = np.zeros(index[1])
                 self.wave_red = np.zeros(index[2])
 
-                for k in range(3):
-                    count = 0
-                    for i in range(num):
-                        if WAVE_BAND_HR[k][0] <= self.wave_grid[i] <= WAVE_BAND_HR[k][1]:
-                            self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
-                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i])
-                            self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
-                            self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
+                with_grating = 0
+                while with_grating <= 1:
+                    for k in range(3):
+                        if (with_grating == 1) and (k == 0 or k == 2):
+                            continue
+                        count = 0
+                        for i in range(num):
+                            if WAVE_BAND_HR[k][0] <= self.wave_grid[i] <= WAVE_BAND_HR[k][1]:
+                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
+                                self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
+                                self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
+                                self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
-                            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                             * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
-                            self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                             * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
-                                                 * (exp_t * N_DARK + N_READ_HR[k] ** 2))
+                                self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                                 * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
+                                self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                                                 * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
+                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                                                     * (exp_t * N_DARK + N_READ_HR[k] ** 2))
 
-                            if k == 0:
-                                self.snr_blue[count] = self.signal[i] / self.noise[i]
-                                self.wave_blue[count] = self.wave_grid[i]
-                            elif k == 1:
-                                self.snr_green[count] = self.signal[i] / self.noise[i]
-                                self.wave_green[count] = self.wave_grid[i]
-                            else:
-                                self.snr_red[count] = self.signal[i] / self.noise[i]
-                                self.wave_red[count] = self.wave_grid[i]
+                                if k == 0:
+                                    self.snr_blue[count] = self.signal[i] / self.noise[i]
+                                    self.wave_blue[count] = self.wave_grid[i]
+                                elif k == 1:
+                                    self.snr_green[count] = self.signal[i] / self.noise[i]
+                                    self.wave_green[count] = self.wave_grid[i]
+                                else:
+                                    self.snr_red[count] = self.signal[i] / self.noise[i]
+                                    self.wave_red[count] = self.wave_grid[i]
 
-                            count += 1
+                                count += 1
 
-                wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
-                snr_arr = [self.snr_blue, self.snr_green, self.snr_red]
+                    wave_arr = [self.wave_blue, self.wave_green, self.wave_red]
+                    snr_arr = [self.snr_blue, self.snr_green, self.snr_red]
+                    self.snr_arr[with_grating] = deepcopy(snr_arr)
+                    with_grating += 1
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
-                                       min_wave, max_wave, snr_arr, wave_arr)
+                                       min_wave, max_wave, self.snr_arr, wave_arr)
 
     def plot_sn_wave_order(self, res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, mag, sky, min_wave, max_wave):
         self.tau_func.set_data(res_mode)

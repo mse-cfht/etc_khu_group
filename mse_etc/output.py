@@ -604,7 +604,7 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
 
             plt.legend(fontsize=15)
         else:
-            ax.plot(wave_arr, sn_arr, 'black', linewidth=1)
+            ax.plot(wave_arr, sn_arr[0], 'black', linewidth=1)
             plt.legend([wave_mode], fontsize=15)
 
         plt.title('MSE-ETC' + ' ' + ini.etc_version + ' '
@@ -637,16 +637,19 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 
         ax = plt.subplot(111)
+        line_style = ['-', '--']
 
         if wave_mode == "Input Wave":
-            ax.plot(wave_arr[0], sn_arr[0], 'blue', linewidth=1, label='Blue')
-            ax.plot(wave_arr[1], sn_arr[1], 'green', linewidth=1, label='Green')
-            ax.plot(wave_arr[2], sn_arr[2], 'red', linewidth=1, label='Red')
-            ax.plot(wave_arr[3], sn_arr[3], 'black', linewidth=1, label='NIR')
-
+            for i in range(2):
+                ax.plot(wave_arr[0], sn_arr[i][0], 'blue', linewidth=1, linestyle=line_style[i], label='Blue')
+                ax.plot(wave_arr[1], sn_arr[i][1], 'green', linewidth=1, linestyle=line_style[i], label='Green')
+                ax.plot(wave_arr[2], sn_arr[i][2], 'red', linewidth=1, linestyle=line_style[i], label='Red')
+                #ax.plot(wave_arr[3], sn_arr[3], 'black', linewidth=1, label='NIR')
             plt.legend(fontsize=15)
+
         else:
-            ax.plot(wave_arr, sn_arr, 'black', linewidth=1)
+            for i in range(2):
+                ax.plot(wave_arr, sn_arr[i], 'black', linewidth=1, linestyle=line_style[i])
             plt.legend([wave_mode], fontsize=15)
 
         plt.title('MSE-ETC' + ' ' + ini.etc_version + ' ' + '(pwv=' + '%.1f' % pwv + ', t=' + '%d' % exp_t + 's, N=' + '%d' % exp_n + ')',
@@ -678,16 +681,21 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 
         ax = plt.subplot(111)
+        line_style = ['-', '--']
 
         if wave_mode == "Input Wave":
-            ax.plot(wave_arr[0], sn_arr[0], 'blue', linewidth=1, label='Blue')
-            ax.plot(wave_arr[1], sn_arr[1], 'green', linewidth=1, label='Green')
-            ax.plot(wave_arr[2], sn_arr[2], 'red', linewidth=1, label='Red')
-
+            for i in range(2):
+                ax.plot(wave_arr[0], sn_arr[i][0], 'blue', linewidth=1, linestyle=line_style[i], label='Blue')
+                ax.plot(wave_arr[1], sn_arr[i][1], 'green', linewidth=1, linestyle=line_style[i], label='Green')
+                ax.plot(wave_arr[2], sn_arr[i][2], 'red', linewidth=1, linestyle=line_style[i], label='Red')
             plt.legend(fontsize=15)
+
         else:
+            pass
+            """
             ax.plot(wave_arr, sn_arr, 'black', linewidth=1)
             plt.legend([wave_mode], fontsize=15)
+            """
 
         plt.title('MSE-ETC' + ' ' + ini.etc_version + ' ' + '(pwv=' + '%.1f' % pwv + ', t=' + '%d' % exp_t + 's, N=' + '%d' % exp_n + ')',
                   fontsize=16)

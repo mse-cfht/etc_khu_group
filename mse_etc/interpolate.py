@@ -128,6 +128,7 @@ class Throughput:
         self.tel_wfc_adc_arr = []
         self.sip_fits_arr = []
         self.sip_arr = []
+        self.sip_no_grating_arr = []
 
         self.data_pwv = [1.0, 2.5, 7.5]
         self.data_atmo = []
@@ -230,6 +231,7 @@ class Throughput:
             self.sip_fits_arr = data[2:-2, 3]
             self.sip_arr = data[2:-2, 4]
             self.data_tau_ie = data[2:-2, 5]
+            self.sip_no_grating_arr = data[2:-2, 6]
 
 
         elif res_mode == "HR":
@@ -267,6 +269,7 @@ class Throughput:
             self.sip_fits_arr = data[2:-1, 3]
             self.sip_arr = data[2:-1, 4]
             self.data_tau_ie = data[2:-1, 5]
+            self.sip_no_grating_arr = [data[3, 6]] * 4 #data[2:-1, 6]
 
 
             data_order = np.loadtxt("Throughput_Order_HR.dat")
@@ -580,7 +583,7 @@ class Throughput:
 
         return result
 
-    def tau_opt_res(self, wave):
+    def tau_opt_res(self, wave, with_grating):
         """ Returns the optical values. """
 
         func_tel_m1_zecoat = interpolate.interp1d(self.tau_wave, self.tel_m1_zecoat_arr,
@@ -589,8 +592,13 @@ class Throughput:
                                                 kind='cubic', fill_value="extrapolate")
         func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr,
                                              kind='cubic', fill_value="extrapolate")
-        func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr,
-                                        kind='cubic', fill_value="extrapolate")
+
+        if with_grating:
+            func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr,
+                                            kind='cubic', fill_value="extrapolate")
+        else:
+            func_sip = interpolate.interp1d(self.tau_wave, self.sip_no_grating_arr,
+                                            kind='cubic', fill_value="extrapolate")
 
         # LR, MR, HR has same value for ENCL, TEL_MSTR, TEL_PFHS, SIP_POSS
         self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR \
