@@ -201,7 +201,7 @@ class Functions:
         for i in range(index):
             self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
             self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * mag[i]) / (h * self.res[i])
-            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + self.n_read[i] ** 2))
+            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[i] ** 2))
             self.snr[i] = self.signal[i] / self.noise[i]
 
         if print_text is True:
@@ -453,7 +453,7 @@ class Functions:
                     self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                      * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
                                     
-                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * (exp_t * N_DARK + N_READ_LR[k] ** 2))
+                    self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_LR[k] ** 2))
                     self.snr[0][i] = self.signal[i] / self.noise[i]
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
@@ -497,7 +497,7 @@ class Functions:
                                              * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
                             self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                              * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
-                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
                                                  * (exp_t * N_DARK + N_READ_LR[k] ** 2))
 
                             if k == 0:
@@ -548,7 +548,7 @@ class Functions:
                         self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                          * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
                         self.noise[i] = sqrt(
-                            self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_MR[k] ** 2))
+                            self.signal[i] + self.sky_bg[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_MR[k] ** 2))
                         self.snr[with_grating][i] = self.signal[i] / self.noise[i]
 
                     with_grating += 1
@@ -595,7 +595,7 @@ class Functions:
                                                  * 10.0 ** (-0.4 * sky) / (h * RES_MR[k])
                                 self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                                  * 10.0 ** (-0.4 * mag) / (h * RES_MR[k])
-                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
                                                      * (exp_t * N_DARK + N_READ_MR[k] ** 2))
 
                                 if k == 0:
@@ -648,7 +648,7 @@ class Functions:
                         self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                          * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
                         self.noise[i] = sqrt(
-                            self.signal[i] + self.sky_bg[i] + N_RES * (exp_t * N_DARK + N_READ_HR[k] ** 2))
+                            self.signal[i] + self.sky_bg[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_HR[k] ** 2))
                         self.snr[with_grating][i] = self.signal[i] / self.noise[i]
 
                     with_grating += 1
@@ -694,7 +694,7 @@ class Functions:
                                                  * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
                                 self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                                  * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
                                                      * (exp_t * N_DARK + N_READ_HR[k] ** 2))
 
                                 if k == 0:
@@ -759,7 +759,7 @@ class Functions:
                                  * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
                 self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                  * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
                                      * (exp_t * N_DARK + N_READ_HR[k] ** 2))
 
                 self.snr_order1[i] = self.signal[i] / self.noise[i]
@@ -786,7 +786,7 @@ class Functions:
                                  * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
                 self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                  * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES
+                self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
                                      * (exp_t * N_DARK + N_READ_HR[k] ** 2))
 
                 self.snr_order2[i] = self.signal[i] / self.noise[i]
