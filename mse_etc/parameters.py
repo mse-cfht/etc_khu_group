@@ -4,34 +4,38 @@ Created on Jan 19, 2020
 @Author: Tae-Geun Ji and Soojong PAK
 """
 
-import math
-import numpy as np
-
+from math import pi, sqrt
 
 # ==== Physical Constants
-C = 299792500       # Speed of light [m s-1]
-h = 6.67259E-34     # Plank constant [J s]
-PI = math.pi        # Circular constant
-MAX_LINE = 4096
+C = 299792500            # Speed of light [m s-1]
+h = 6.67259E-34          # Plank constant [J s]
 
 # ==== Instruments Parameters
-D_TEL = 10.14           # Telescope aperture [m]
-S_ZM = 10**(-56.1/2.5)  # Definition of AB mag [W m-2 Hz-2]
-N_RES = 16              # Pixel
-N_DARK = 0.02           # Dark current [e s-1 pix-1]
-# ==== LR (added by CK)
-RES_LR = [2550, 3650, 3600, 3600, 1, -1]  # B, G, R, NIR, and Input band in LR: spectral resolution [nm]
-WAVE_LR = [482, 626, 900, 1235, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
-N_READ_LR = [13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 21.4/math.sqrt(7.2), 0, 0]
-# ==== MR (added by CK)
-RES_MR = [4400, 6200, 6100, 6000, 1, -1]  # B, G, R, NIR, and Input band in LR: spectral resolution [nm]
-WAVE_MR = [482, 626, 767, 1662, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
-N_READ_MR = [13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 21.4/math.sqrt(7.2), 0, 0]
-# ==== HR (added by CK)
-RES_HR = [40000, 40000, 20000, 20000, 1, -1]  # B, G, R, NIR, and Input band in LR: spectral resolution [nm]
-WAVE_HR = [400, 482, 767, 900, 0, 0]     # B, G, R, NIR, and Input band in LR: wavelength [nm]
-N_READ_HR = [13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 13.4/math.sqrt(7.2), 21.4/math.sqrt(7.2), 0, 0]
+D_TEL = 10.14            # Telescope diameter [m]
+A_TEL = pi*(D_TEL/2)**2  # Light collecting area [m2]
+S_ZM = 10**(-56.1/2.5)   # Definition of AB mag [W m-2 Hz-2]
+N_RES = 16               # Pixel
+N_DARK = 0.02            # Dark current [e s-1 pix-1]
 
+# ==== LR
+RES_LR = [2550, 3650, 3600, 3600]  # B, G, R, NIR on LR: Spectral resolution [nm]
+CTR_LR = [482, 626, 900, 1235]     # B, G, R, NIR on LR: Central wavelength [nm]
+WAVE_BAND_LR = [[360, 560], [540, 740], [715, 985], [960, 1800]]  # B, G, R, NIR on LR: Wavelength range [nm]
+WAVE_OVLP_LR = [[540, 560], [715, 740], [960, 985]]               # Overlap range [nm]
+N_READ_LR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2), 21.4/sqrt(7.2)]
+
+# ==== MR
+RES_MR = [4400, 6200, 6100, 6000]   # B, G, R, NIR, and Input band in MR: spectral resolution [nm]
+CTR_MR = [482, 626, 767]#, 1662]      # B, G, R, NIR, and Input band in MR: wavelength [nm]
+WAVE_BAND_MR = [[350, 510], [576, 700], [737, 900]]#, [1457, 1800]]
+N_READ_MR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2), 21.4/sqrt(7.2)]
+
+# ==== HR
+RES_HR = [40000, 40000, 20000]  # B, G, R and Input band in LR: spectral resolution [nm]
+CTR_HR = [400, 482, 767]        # B, G, R and Input band in LR: wavelength [nm]
+WAVE_BAND_HR = [[359, 440], [460, 600], [620, 900]]
+WAVE_OVLP_HR = [[440, 460], [600, 620]]
+N_READ_HR = [13.4/sqrt(7.2), 13.4/sqrt(7.2), 13.4/sqrt(7.2)]
 
 # ==== Throughput Parameters: B, G, R, and NIR band of LR
 ENCL_LR = 1.000
@@ -71,7 +75,7 @@ SIP_HR_WoG = [0.405, 0.415, 0.435, 0]
 TAU_IE_HR = [0.426, 0.430, 0.449, 0]         # Injection efficiency
 TAU_ATMO_HR = [1.000, 1.000, 1.000, 1.000]       # Atmospheric transmission (TBD)
 
-# ==== Text Paramters
+# ==== Text Parameters: Filter Band
 BAND_LR = ['Blue', 'Green', 'Red', 'NIR', '', '']
-BAND_MR = ['Blue', 'Green', 'Red', 'NIR', '', '']
+BAND_MR = ['Blue', 'Green', 'Red', '', '', '']
 BAND_HR = ['Blue', 'Green', 'Red', '', '', '']
