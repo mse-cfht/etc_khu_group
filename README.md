@@ -34,8 +34,10 @@ In the directory of the user's choice, download the ETC Github repository (if ne
 The code should function immediately after download (and unpacking)
 
 ### Operation
-Type the following at the command line of the user's terminal interface:
-'python main.py'
+If necessary, activate the appropriate conda environemt.  Then, type the following at the command line of the user's terminal interface:
+
+`python main.py`
+
 
 After hitting enter, a GUI interface to the ETC should pop up.  Please enter all necessary values into the GUI interface. 
 
