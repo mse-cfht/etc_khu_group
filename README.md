@@ -38,12 +38,11 @@ If necessary, activate the appropriate conda environemt.  Then, type the followi
 
 `python main.py`
 
-
 After hitting enter, a GUI interface to the ETC should pop up.  Please enter all necessary values into the GUI interface. 
 
 For the calculations of `S/N` and `Exp. Time`, output data will appear on the termainal screen. 
 
-For the calculations of `S/N v. Magnitude' and `S/N v. Wavelength', the associated output plot data will appear in a separate display screen (associated withe matplotlib API).
+For the calculations of `S/N v. Magnitude` and `S/N v. Wavelength`, the associated output plot data will appear in a separate display screen (associated withe matplotlib API).
 
 ### Termination
 In the GUI interface, select/click on the red X button in the upper left-hand corner.
