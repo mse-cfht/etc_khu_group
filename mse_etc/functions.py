@@ -493,11 +493,14 @@ class Functions:
                             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
+                            tel_data = self.tau_func.telluric_emission(self.wave_grid[i])
+                            self.sky_bg_te[i] = exp_t * exp_n * A_TEL * self.tau[i] * tel_data * (206265 ** 2)
+
                             self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                              * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
                             self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                              * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
-                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n
+                            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * exp_n
                                                  * (exp_t * N_DARK + N_READ_LR[k] ** 2))
 
                             if k == 0:

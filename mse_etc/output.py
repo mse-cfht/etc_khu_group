@@ -419,6 +419,7 @@ def display_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, mag_r
         ax.axis([min_mag, max_mag, 1, 1000])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     elif res_mode == "MR":
 
@@ -455,6 +456,7 @@ def display_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, mag_r
         ax.axis([min_mag, max_mag, 1, 1000])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     elif res_mode == "HR":
 
@@ -491,6 +493,7 @@ def display_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, mag_r
         ax.axis([min_mag, max_mag, 1, 1000])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     if gui.MainGUI.save:
        display_simple_text("Data file (%s.txt) is saved." % filename)
@@ -620,7 +623,7 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.xlim([min_wave, max_wave])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
-
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     elif res_mode == "MR":
 
@@ -640,11 +643,13 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         line_style = ['-', '--']
 
         if wave_mode == "Input Wave":
-            for i in range(2):
-                ax.plot(wave_arr[0], sn_arr[i][0], 'blue', linewidth=1, linestyle=line_style[i], label='Blue')
-                ax.plot(wave_arr[1], sn_arr[i][1], 'green', linewidth=1, linestyle=line_style[i], label='Green')
-                ax.plot(wave_arr[2], sn_arr[i][2], 'red', linewidth=1, linestyle=line_style[i], label='Red')
-                #ax.plot(wave_arr[3], sn_arr[3], 'black', linewidth=1, label='NIR')
+            ax.plot(wave_arr[0], sn_arr[0][0], 'blue', linewidth=1, linestyle=line_style[0], label='Blue')
+            ax.plot(wave_arr[1], sn_arr[0][1], 'green', linewidth=1, linestyle=line_style[0], label='Green')
+            ax.plot(wave_arr[2], sn_arr[0][2], 'red', linewidth=1, linestyle=line_style[0], label='Red')
+            #ax.plot(wave_arr[3], sn_arr[3], 'black', linewidth=1, label='NIR')
+            ax.plot(wave_arr[0], sn_arr[1][0], 'blue', linewidth=1, linestyle=line_style[1])
+            ax.plot(wave_arr[1], sn_arr[1][1], 'green', linewidth=1, linestyle=line_style[1])
+            ax.plot(wave_arr[2], sn_arr[1][2], 'red', linewidth=1, linestyle=line_style[1])
             plt.legend(fontsize=15)
 
         else:
@@ -665,6 +670,7 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.xlim([min_wave, max_wave])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     elif res_mode == "HR":
 
@@ -684,11 +690,14 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         line_style = ['-', '--']
 
         if wave_mode == "Input Wave":
-            for i in range(2):
-                ax.plot(wave_arr[0], sn_arr[i][0], 'blue', linewidth=1, linestyle=line_style[i], label='Blue')
-                ax.plot(wave_arr[1], sn_arr[i][1], 'green', linewidth=1, linestyle=line_style[i], label='Green')
-                ax.plot(wave_arr[2], sn_arr[i][2], 'red', linewidth=1, linestyle=line_style[i], label='Red')
+            ax.plot(wave_arr[0], sn_arr[0][0], 'blue', linewidth=1, linestyle=line_style[0], label='Blue')
+            ax.plot(wave_arr[1], sn_arr[0][1], 'green', linewidth=1, linestyle=line_style[0], label='Green')
+            ax.plot(wave_arr[2], sn_arr[0][2], 'red', linewidth=1, linestyle=line_style[0], label='Red')
+            ax.plot(wave_arr[1], sn_arr[1][1], 'green', linewidth=1, linestyle=line_style[1])
+
             plt.legend(fontsize=15)
+            #plt.text(0.1, 0.8, '- With Grating', ha='center', va='center', transform=ax.transAxes)
+            #plt.text(0.1, 0.75, '-- No Grating', ha='center', va='center', transform=ax.transAxes)
 
         else:
             pass
@@ -710,6 +719,7 @@ def display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky, m
         plt.xlim([min_wave, max_wave])
         ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
         ax.grid(color='k', linestyle='-', which='major', linewidth=1)
+        plt.tick_params(axis='both', which='major', labelsize=14)
 
     if gui.MainGUI.save:
         display_simple_text("Data file (%s.txt) is saved." % filename)
@@ -763,7 +773,7 @@ def display_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n
 
     ax.grid(color='k', linestyle='-', which='minor', linewidth=0.5)
     ax.grid(color='k', linestyle='-', which='major', linewidth=1)
-
+    plt.tick_params(axis='both', which='major', labelsize=14)
     # if gui.MainGUI.save:
     #    display_simple_text("Data file (%s.txt) is saved." % filename)
 
