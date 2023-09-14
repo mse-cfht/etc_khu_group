@@ -1,10 +1,11 @@
-from astropy.io import fits
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
-from scipy import interpolate
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.table import Table
 from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.convolution import Box1DKernel, Gaussian1DKernel, convolve
+from astropy.io import fits
+from astropy.table import Table
+from scipy import interpolate
 
 """
 
@@ -192,8 +193,8 @@ for l in pwv:
         binning = bin2 / bin1
         print(binning)
 
-        #g1 = Box1DKernel(binning)
-        g1 = Gaussian1DKernel(binning)
+        g1 = Box1DKernel(binning)
+        #g1 = Gaussian1DKernel(binning)
         z1 = convolve(data_atmo1, g1)
 
         # interpolate
@@ -240,9 +241,9 @@ for l in pwv:
         plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 
         ax = plt.subplot(111)
-        ax.plot(data_wave1, data_atmo1, 'lightgreen', linewidth=1, label='lightgreen')
-        ax.plot(data_wave2, data_atmo2, 'red', linewidth=1, label='red')
-        ax.plot(data_wave2, result, 'blue', linewidth=1, label='blue')
+        ax.plot(data_wave1, data_atmo1, 'lightgreen', linewidth=1.4, label='lightgreen')
+        # ax.plot(data_wave2, data_atmo2, 'red', linewidth=1, label='red')
+        ax.plot(data_wave2, result, 'red', linewidth=1.4, label='red')
 
         if k == 4400:
             plt.xlim([391, 510])
@@ -252,14 +253,18 @@ for l in pwv:
             plt.xlim([737, 900])
         elif k == 6000:
             plt.xlim([1457, 1780])
-        plt.legend(["R=50000(data)",f"R={k}(data)", f"R={k}(Boxcar)"], fontsize=15)
+        # plt.legend(["R=50000(data)",f"R={k}(data)", f"R={k}(Boxcar)"], fontsize=15)
+        plt.legend(["R=50000(model data)", f"R={k}(convolved data)"], fontsize=24)
 
-        plt.title(f'pwv = {l}', fontsize=16)
-        plt.xlabel('Wavelength', fontsize=15)
-        plt.ylabel('Transmission', fontsize=15)
+        plt.rc('xtick', labelsize=24)
+        plt.rc('ytick', labelsize=24)
+
+        plt.title(f'pwv = {l}', fontsize=24)
+        plt.xlabel('Wavelength', fontsize=24)
+        plt.ylabel('Transmission', fontsize=24)
 
         plt.show()
-
+'''
 #part saving the gaussian file
 name = ' '
 
@@ -312,5 +317,6 @@ for k in res:
 
     hdul = fits.HDUList([primary_hdu, table_hdu])
     hdul.writeto(f'SKY/MSE_AM1_box_{name}_MR.fits', overwrite=True)
+'''
 
 

@@ -8,13 +8,23 @@ Modification Log:
     * 2021.04.09 - Version 0.3.0 was updated by Hojae Ahn
     * 2021.04.27 - Version 0.3.1 was updated by Mingyeong Yang
     * 2021.06.03 - Version 1.1.0 was updated by Hojae Ahn
+    * 2021.06.17 - Version 1.2.0 was updated by Tae-Geun Ji
+    * 2021.08.04 - Version 1.2.1 was updated by Changgon Kim
+    * 2023.06.14 - Version 1.3.0 was updated by Tae-Geun Ji
 """
 
-from gui import *
+from tkinter import Tk
+
+import initial_values as ini
+from gui import MainGUI
 
 if __name__ == '__main__':
-    print('=========== ' + ini_etc_title + " " + ini_etc_version + " (" + ini_etc_date + ", " + ini_etc_editor + ') ============')
+
+    title_name = f'{ini.etc_title} {ini.etc_version} ({ini.etc_date}, {ini.etc_editor})'
+
+    print('=========== ' + title_name + ' ============')
+    
     root = Tk()
-    root.title(ini_etc_title + " " + ini_etc_version + " (" + ini_etc_date + ", " + ini_etc_editor + ')') # change 20210324 by T-G. Ji
+    root.title(title_name)
     frame = MainGUI(root)
     frame.mainloop()

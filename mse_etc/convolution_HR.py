@@ -1,10 +1,17 @@
-from astropy.io import fits
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
-from scipy import interpolate
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.table import Table
+"""ESO sky model data convolution of MSE ETC.
+
+Modification Log:
+    * 2021.09.06 - Updated by Changgon Kim
+"""
+
 from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.convolution import Box1DKernel, Gaussian1DKernel, convolve
+from astropy.io import fits
+from astropy.table import Table
+from scipy import interpolate
 
 """
 
@@ -68,12 +75,13 @@ for l in pwv:
     row_green1 = data1[0:37463] #11443:28590
     row_red1 = data1[0:47224]
 
-#    nlen1 = len(row_red1)
-#    data_wave1 = np.zeros(nlen1)
-#    data_atmo1 = np.zeros(nlen1)
-#    for i in range(0, nlen1):
-#        data_wave1[i] = row_red1[i][0]
-#        data_atmo1[i] = row_red1[i][1]
+    nlen1 = len(row_red1)
+    data_wave1 = np.zeros(nlen1)
+    data_atmo1 = np.zeros(nlen1)
+    for i in range(0, nlen1):
+        data_wave1[i] = row_red1[i][0]
+        data_atmo1[i] = row_red1[i][1]
+
     for k in wave:
 
         if k == 400.0:
@@ -137,7 +145,7 @@ for l in pwv:
                     index_start = s
                     break
 
-        print(data2[1][0], l, k, index_start, index_end)
+        # print(data2[1][0], l, k, index_start, index_end)
 
         #distinguish wavelength Blue/Green/Red/NIR
         if k == 400:
@@ -156,7 +164,7 @@ for l in pwv:
         """
 
         nlen2 = len(row_data)
-
+        print(nlen1)
         print(nlen2)
         data_wave2 = np.zeros(nlen2)
         data_atmo2 = np.zeros(nlen2)
@@ -243,7 +251,7 @@ for l in pwv:
         plt.ylabel('Transmission', fontsize=15)
 
         plt.show()
-
+'''
 #part saving the gaussian file
 name = ' '
 
@@ -295,5 +303,6 @@ for k in wave:
     hdul = fits.HDUList([primary_hdu, table_hdu])
     hdul.writeto(f'SKY/MSE_AM1_box_{name}_HR.fits', overwrite=True)
     hdul.writeto(f'SKY/MSE_AM1_box_{name}_HR.fits', overwrite=True)
+'''
 
 
