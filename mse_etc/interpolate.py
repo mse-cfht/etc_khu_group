@@ -19,8 +19,6 @@ Modification Log:
 import numpy as np
 from astropy.io import fits
 from scipy import interpolate
-
-from convolution_OH import TelluricData
 from parameters import *
 
 
@@ -32,29 +30,26 @@ class Throughput:
 
         print('...... Reading skytable for atmospheric throughput calculation.')
 
-        # Adding the telluric emission convolution data
-        self.data_instance = TelluricData()
-         
         # Atmospheric transmission data for low resolution
-        blue_low_box_path = 'SKY/MSE_AM1_box_blue.fits'
-        green_low_box_path = 'SKY/MSE_AM1_box_green.fits'
-        red_low_box_path = 'SKY/MSE_AM1_box_red.fits'
-        nir_low_box_path = 'SKY/MSE_AM1_box_nir.fits'
+        blue_low_box_path = 'tau_sky/MSE_AM1_box_blue.fits'
+        green_low_box_path = 'tau_sky/MSE_AM1_box_green.fits'
+        red_low_box_path = 'tau_sky/MSE_AM1_box_red.fits'
+        nir_low_box_path = 'tau_sky/MSE_AM1_box_nir.fits'
 
         # Atmospheric transmission data for moderate resolution
-        blue_moderate_box_path = 'SKY/MSE_AM1_box_blue_MR.fits'
-        green_moderate_box_path = 'SKY/MSE_AM1_box_green_MR.fits'
-        red_moderate_box_path = 'SKY/MSE_AM1_box_red_MR.fits'
-        nir_moderate_box_path = 'SKY/MSE_AM1_box_NIR_MR.fits'
+        blue_moderate_box_path = 'tau_sky/MSE_AM1_box_blue_MR.fits'
+        green_moderate_box_path = 'tau_sky/MSE_AM1_box_green_MR.fits'
+        red_moderate_box_path = 'tau_sky/MSE_AM1_box_red_MR.fits'
+        nir_moderate_box_path = 'tau_sky/MSE_AM1_box_NIR_MR.fits'
 
         # Atmospheric transmission data for high resolution
-        blue_high_box_path = 'SKY/MSE_AM1_box_blue_HR.fits'
-        green_high_box_path = 'SKY/MSE_AM1_box_green_HR.fits'
-        red_high_box_path = 'SKY/MSE_AM1_box_red_HR.fits'
+        blue_high_box_path = 'tau_sky/MSE_AM1_box_blue_HR.fits'
+        green_high_box_path = 'tau_sky/MSE_AM1_box_green_HR.fits'
+        red_high_box_path = 'tau_sky/MSE_AM1_box_red_HR.fits'
 
         # Telluric emission data for LR
-        nir_low_tel_path = 'data/result_MSE_OH_data_LR.fits'
-        
+        nir_low_tel_path = 'tau_sky/MSE_OH_data_LR.fits'
+
         # read fits files and set data (LR)
         self.file_blue_low = fits.open(blue_low_box_path)
         self.file_green_low = fits.open(green_low_box_path)
@@ -74,7 +69,7 @@ class Throughput:
 
         # read fits file and set data (LR-TEL_EMISSION)
         self.file_nir_low_tel = fits.open(nir_low_tel_path)
-        
+
         # read data (LR)
         self.data_blue_low = self.file_blue_low[1].data
         self.data_green_low = self.file_green_low[1].data
@@ -94,7 +89,7 @@ class Throughput:
 
         # read data (LR-TEL_EMISSION)
         self.data_nir_low_tel = self.file_nir_low_tel[1].data
-        
+
         # close files
         self.file_blue_low.close()
         self.file_green_low.close()
@@ -114,12 +109,19 @@ class Throughput:
 
         # close files
         self.file_nir_low_tel.close()
-        
+
+        self.wave_blue = []
+        self.wave_green = []
+        self.wave_red = []
+        self.wave_nir = []
+        self.wave_tel = []
+
         self.atmo_blue = []
         self.atmo_green = []
         self.atmo_red = []
         self.atmo_nir = []
-        
+        self.atmo_tel = []
+
         # added by CK 20210903
         self.sky_bg_te = []
 
@@ -129,6 +131,7 @@ class Throughput:
         self.sip_fits_arr = []
         self.sip_arr = []
         self.sip_no_grating_arr = []
+        self.data_tau_ie = []
 
         self.data_pwv = [1.0, 2.5, 7.5]
         self.data_atmo = []
@@ -161,32 +164,31 @@ class Throughput:
             self.wave_green = self.data_green_low.field(0)
             self.wave_red = self.data_red_low.field(0)
             self.wave_nir = self.data_nir_low.field(0)
+            self.wave_tel = self.data_nir_low_tel.field(0)
 
-            # added by CK 20210903
-            self.tel_wave = self.data_nir_low_tel.field(0)
-            
             self.atmo_blue = []
             self.atmo_blue = np.array([self.data_blue_low.field(1),
-                                     self.data_blue_low.field(2),
-                                     self.data_blue_low.field(3)])
+                                       self.data_blue_low.field(2),
+                                       self.data_blue_low.field(3)])
 
             self.atmo_green = []
             self.atmo_green = np.array([self.data_green_low.field(1),
-                                      self.data_green_low.field(2),
-                                      self.data_green_low.field(3)])
+                                        self.data_green_low.field(2),
+                                        self.data_green_low.field(3)])
 
             self.atmo_red = []
             self.atmo_red = np.array([self.data_red_low.field(1),
-                                    self.data_red_low.field(2),
-                                    self.data_red_low.field(3)])
+                                      self.data_red_low.field(2),
+                                      self.data_red_low.field(3)])
 
             self.atmo_nir = []
             self.atmo_nir = np.array([self.data_nir_low.field(1),
-                                    self.data_nir_low.field(2),
-                                    self.data_nir_low.field(3)])
+                                      self.data_nir_low.field(2),
+                                      self.data_nir_low.field(3)])
 
+            self.atmo_tel = self.data_nir_low_tel.field(1)
 
-            data = np.loadtxt("Throughput_LR.dat")
+            data = np.loadtxt("tau_opt/Throughput_LR.dat")
 
             self.tau_wave = data[:, 0]
             self.tel_m1_zecoat_arr = data[:, 1]
@@ -222,8 +224,7 @@ class Throughput:
                                       self.data_nir_moderate.field(1),
                                       self.data_nir_moderate.field(1)])
 
-
-            data = np.loadtxt("Throughput_MR.dat")
+            data = np.loadtxt("tau_opt/Throughput_MR.dat")
 
             self.tau_wave = data[2:-2, 0]
             self.tel_m1_zecoat_arr = data[2:-2, 1]
@@ -232,7 +233,6 @@ class Throughput:
             self.sip_arr = data[2:-2, 4]
             self.data_tau_ie = data[2:-2, 5]
             self.sip_no_grating_arr = data[2:-2, 6]
-
 
         elif res_mode == "HR":
 
@@ -260,8 +260,7 @@ class Throughput:
                                       self.data_nir_low.field(1),
                                       self.data_nir_low.field(1)])
 
-
-            data = np.loadtxt("Throughput_HR.dat")
+            data = np.loadtxt("tau_opt/Throughput_HR.dat")
 
             self.tau_wave = data[2:-1, 0]
             self.tel_m1_zecoat_arr = data[2:-1, 1]
@@ -269,10 +268,9 @@ class Throughput:
             self.sip_fits_arr = data[2:-1, 3]
             self.sip_arr = data[2:-1, 4]
             self.data_tau_ie = data[2:-1, 5]
-            self.sip_no_grating_arr = [data[3, 6]] * 4 #data[2:-1, 6]
+            self.sip_no_grating_arr = [data[3, 6]] * 4
 
-
-            data_order = np.loadtxt("Throughput_Order_HR.dat")
+            data_order = np.loadtxt("tau_opt/Throughput_Order_HR.dat")
             self.index_order = data_order[:, 0]
             self.tau_wave_order = data_order[:, 1]
             self.data_tau_order = data_order[:, 2]
@@ -344,7 +342,6 @@ class Throughput:
     def tau_atmo_red(self, pwv):
         """Returns the atmospheric throughput in red wavelength. """
 
-
         if pwv == 1.0:
             func = interpolate.interp1d(self.wave_red, self.atmo_red[0, :], kind='linear', fill_value="extrapolate")
             self.tau_atmo = func(self.wave_red)
@@ -361,7 +358,6 @@ class Throughput:
 
     def tau_atmo_nir(self, pwv):
         """Returns the atmospheric throughput in nir-infrared wavelength. """
-
 
         if pwv == 1.0:
             func = interpolate.interp1d(self.wave_nir, self.atmo_nir[0, :], kind='linear', fill_value="extrapolate")
@@ -380,7 +376,7 @@ class Throughput:
     def cal_tau_atmo(self, wave, transmission1, transmission2, transmission7, pwv):
         """Calculates the atmospheric throughput with parameters.
 
-        This function estimates the transmission value corresponding to a specific pwv 
+        This function estimates the transmission value corresponding to a specific pwv
         by calculating transmission data with different pwv.
 
         params:
@@ -394,7 +390,7 @@ class Throughput:
             transmission7 (float): The atmospheric transmission extracted under pwv = 7.5.
             pwv (float): Precipitable Water Vapor.
 
-        Returns: 
+        Returns:
             y (float): The atmospheric transmission.
 
         Raises:
@@ -495,7 +491,8 @@ class Throughput:
             transmission2_m = self.tau_atmo_blue(self.data_pwv[1])
             transmission7_m = self.tau_atmo_blue(self.data_pwv[2])
 
-            throughput_m = self.cal_tau_atmo(self.wave_blue, transmission1_m, transmission2_m, transmission7_m, input_pwv)
+            throughput_m = self.cal_tau_atmo(self.wave_blue, transmission1_m, transmission2_m, transmission7_m,
+                                             input_pwv)
             func = interpolate.interp1d(self.wave_blue, throughput_m, kind='linear', fill_value="extrapolate")
             self.tau_atmo_m = func(input_wavelength)
 
@@ -575,7 +572,7 @@ class Throughput:
         self.tau_atmo = self.tau_atmo / input_airmass
         return self.tau_atmo
 
-    def get_tau_order(self, wave): # Only consider to index for HR
+    def get_tau_order(self, wave):  # Only consider to index for HR
         """ Returns the throughput values. """
 
         func_tau_order = interpolate.interp1d(self.data_wave, self.data_tau, kind='cubic', fill_value="extrapolate")
@@ -613,15 +610,18 @@ class Throughput:
         self.tau_ie = func_tau_ie(wave)
 
         return self.tau_ie
-    
+
     # added by CK 20210903
     def telluric_emission(self, wave):
         """Returns the telluric emission data"""
-        
-        func_tel_em = self.data_instance.func
-        if wave >= 1400 and wave <= 1800:
-            self.sky_bg_te = func_tel_em(wave)
+
+        if 1400 <= wave <= 1800:
+            # interpolate
+            func = interpolate.interp1d(self.wave_tel, self.atmo_tel, kind='linear', fill_value="extrapolate")
+            # self.func = interpolate.interp1d(self.data_wave, self.data_atmo, kind='linear')
+            self.sky_bg_te = func(wave)
+
         else:
-            self.sky_bg_te = 0.0        
-        
+            self.sky_bg_te = 0.0
+
         return self.sky_bg_te

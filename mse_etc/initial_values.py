@@ -34,4 +34,4 @@ max_mag = 26.0
 wave = 482
 sky = [20.7, 20.7, 20.7, 20.7, 20.7]
 min_wave = 360
-max_wave = 1320
+max_wave = 1800

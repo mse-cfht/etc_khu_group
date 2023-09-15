@@ -173,9 +173,6 @@ class MainGUI(tk.Frame):
         self.mag_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
         self.mag_nir_entry.place(x=160, y=320, anchor=tk.W)
-        
-        
-        # was commented
 
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
@@ -185,7 +182,6 @@ class MainGUI(tk.Frame):
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
         self.mag_wave_entry.place(x=160, y=350, anchor=tk.W)
 
-        
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
         self.sky_label.place(x=260, y=200, anchor=tk.W)
@@ -217,7 +213,6 @@ class MainGUI(tk.Frame):
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
         self.sky_wave_entry.place(x=320, y=350, anchor=tk.W)
-
 
         # Mag. Range (AB)
         self.mag_range_label = tk.Label(self.input_frame, text="Mag. Range (AB):", font=self.font, bg=ini.c2)
@@ -283,7 +278,6 @@ class MainGUI(tk.Frame):
         self.wave_blue_combo["values"] = wave_blue_values
         self.wave_blue_combo.current(0)
         self.wave_blue_combo.place(x=600, y=130, anchor=tk.W)
-
 
         self.wave_green_combo_mode = tk.StringVar()
         self.wave_green_combo = ttk.Combobox(self.input_frame, width=16, height=13, textvariable=self.wave_green_combo_mode,
@@ -391,13 +385,13 @@ class MainGUI(tk.Frame):
 
         if status == 'normal':
             if self.resolution.get() != "LR":
-                self.wave_nir_radio.config(state='disable')
+                self.wave_nir_radio.config(state='disabled')
             else:
                 self.wave_nir_radio.config(state=status)
 
             if self.wave_mode.get() != "Input Wave":
-                self.min_wave_entry.config(state='disable')
-                self.max_wave_entry.config(state='disable')
+                self.min_wave_entry.config(state='disabled')
+                self.max_wave_entry.config(state='disabled')
 
     def ui_wave_add(self, status):  # add 20210617 by T-G. Ji
         self.wave_blue_combo.config(state=status)
@@ -446,7 +440,7 @@ class MainGUI(tk.Frame):
             self.ui_sky_brightness('disable')
             self.ui_wave_range('normal')
             self.ui_mag_range('disable')
-            self.set_wave_entry.config(state='disable')
+            self.set_wave_entry.config(state='disabled')
 
             if self.resolution.get() == "HR":
                 self.ui_wave_add('normal')
@@ -459,11 +453,9 @@ class MainGUI(tk.Frame):
             self.max_wave_entry.config(state='normal')
 
         else:
-            self.min_wave_entry.config(state='disable')
-            self.max_wave_entry.config(state='disable')
+            self.min_wave_entry.config(state='disabled')
+            self.max_wave_entry.config(state='disabled')
 
-
-    # change 20210324 by T-G. Ji
     def run(self):
         res_mode = self.resolution.get()
         wave_mode = self.wave_mode.get()
@@ -529,7 +521,13 @@ class MainGUI(tk.Frame):
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
-                
+                    if self.min_wave < 360 or self.max_wave > 1800:
+                        print('Input wavelength must be from 360 to 1800 in LR mode.')
+                        return
+
+                print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                      '(elapsed time for few seconds ~ 2 minutes)')
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
@@ -552,51 +550,30 @@ class MainGUI(tk.Frame):
                     self.min_wave = WAVE_BAND_MR[2][0]
                     self.max_wave = WAVE_BAND_MR[2][1]
 
-
-                #elif wave_mode == "NIR":
-                    #self.mag = float(self.mag_nir_entry.get())
-                    #self.sky = float(self.sky_nir_entry.get())
-                    #self.min_wave = WAVE_BAND_MR[3][0]
-                    #self.max_wave = WAVE_BAND_MR[3][1]
-
-
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
+                    if self.min_wave < 391 or self.max_wave > 900:
+                        print('Input wavelength must be from 391 to 900 in MR mode.')
+                        return
+
+                print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                      '(elapsed time for few seconds ~ 1 minutes)')
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
             elif res_mode == "HR":
                 if wave_mode == "Blue":
-                    #if wave_blue_mode == "Blue":
-                    #    self.mag = float(self.mag_blue_entry.get())
-                    #    self.sky = float(self.sky_blue_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[0][0]
-                    #    self.max_wave = WAVE_BAND_HR[0][1]
-                    #else:
-
                     wave_mode = wave_blue_mode
 
                 elif wave_mode == "Green":
-                    #if wave_green_mode == "Green":
-                    #    self.mag = float(self.mag_green_entry.get())
-                    #    self.sky = float(self.sky_green_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[1][0]
-                    #    self.max_wave = WAVE_BAND_HR[1][1]
-
-                    #else:
                     wave_mode = wave_green_mode
 
                 elif wave_mode == "Red":
-                    #if wave_red_mode == "Red":
-                    #    self.mag = float(self.mag_red_entry.get())
-                    #    self.sky = float(self.sky_red_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[2][0]
-                    #    self.max_wave = WAVE_BAND_HR[2][1]
-                    #else:
                     wave_mode = wave_red_mode
 
                 elif wave_mode == "Input Wave":
@@ -605,7 +582,12 @@ class MainGUI(tk.Frame):
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
-                if (wave_mode != "Blue") and (wave_mode != "Green") and (wave_mode != "Red") and (wave_mode != "Input Wave"):
+                    if self.min_wave < 360 or self.max_wave > 900:
+                        print('Input wavelength must be from 360 to 900 in HR mode.')
+                        return
+
+                if (wave_mode != "Blue") and (wave_mode != "Green") and (wave_mode != "Red") \
+                        and (wave_mode != "Input Wave"):
                     self.mag = float(self.mag_blue_entry.get())
                     self.sky = float(self.sky_blue_entry.get())
 
@@ -623,12 +605,15 @@ class MainGUI(tk.Frame):
 
                             break
 
-                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
-                                                 self.min_wave, self.max_wave)
+                    print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                          '(elapsed time for few seconds ~ 1 minutes)')
+
+                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, self.mag,
+                                                 self.sky, self.min_wave, self.max_wave)
                     return None
 
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
-                                   self.min_wave, self.max_wave)
+                                       self.min_wave, self.max_wave)
 
         else:
             return None
