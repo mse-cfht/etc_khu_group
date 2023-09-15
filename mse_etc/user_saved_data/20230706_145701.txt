@@ -1,0 +1,15 @@
+======================================================
+The calculation Signal-to-Noise from single magnitude input
+
+Resolution Mode   = Moderate Resolution
+Airmass           = 1.0
+PWV [mm]          = 1.0
+Exposure Time [s] = 1200
+Exposure Number   = 1
+
+Band	 Mag. 	 Sky 	 S/N
+[Blue]	 18.00 	 20.70 	 87.309383
+[Green]	 18.00 	 20.70 	 84.767129
+[Red]	 18.00 	 20.70 	 86.150176
+[NIR]	 18.00 	 20.70 	 87.309383
+[482.0]	 18.00 	 20.70 	 87.309383 	 (Band = Blue)

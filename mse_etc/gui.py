@@ -7,6 +7,7 @@ Modification Log:
     * 2021.04.09 - Updated by Hojae Ahn
     * 2021.06.03 - Updated by Hojae Ahn
     * 2021.06.17 - Updated by Tae-Geun Ji
+    * 2023.06.14 - Updated by Tae-Geun Ji
 """
 
 import tkinter as tk
@@ -29,7 +30,7 @@ class MainGUI(tk.Frame):
 
         # ==== Size of Main Window
         self.master.geometry("1000x800")
-        self.master.resizable(False, False)
+        self.master.resizable(True, True)
 
         self.font_section = font.Font(family="Verdana", size=13)
         self.font = font.Font(family="Arial", size=11)
@@ -172,9 +173,6 @@ class MainGUI(tk.Frame):
         self.mag_nir_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                       textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font)
         self.mag_nir_entry.place(x=160, y=320, anchor=tk.W)
-        
-        
-        # was commented
 
         self.set_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.wave), font=self.font, bg="khaki")
@@ -184,7 +182,6 @@ class MainGUI(tk.Frame):
                                        textvariable=tk.DoubleVar(value=ini.min_mag), font=self.font, bg="khaki")
         self.mag_wave_entry.place(x=160, y=350, anchor=tk.W)
 
-        
         # Sky Brightness (AB)
         self.sky_label = tk.Label(self.input_frame, text="Sky Brightness (AB):", font=self.font, bg=ini.c2)
         self.sky_label.place(x=260, y=200, anchor=tk.W)
@@ -216,7 +213,6 @@ class MainGUI(tk.Frame):
         self.sky_wave_entry = tk.Entry(self.input_frame, width=6, justify=tk.CENTER,
                                        textvariable=tk.DoubleVar(value=ini.sky[4]), font=self.font, bg="khaki")
         self.sky_wave_entry.place(x=320, y=350, anchor=tk.W)
-
 
         # Mag. Range (AB)
         self.mag_range_label = tk.Label(self.input_frame, text="Mag. Range (AB):", font=self.font, bg=ini.c2)
@@ -283,7 +279,6 @@ class MainGUI(tk.Frame):
         self.wave_blue_combo.current(0)
         self.wave_blue_combo.place(x=600, y=130, anchor=tk.W)
 
-
         self.wave_green_combo_mode = tk.StringVar()
         self.wave_green_combo = ttk.Combobox(self.input_frame, width=16, height=13, textvariable=self.wave_green_combo_mode,
                                              postcommand=self.ui_wave_enable, font=self.font, state='disabled')
@@ -303,123 +298,6 @@ class MainGUI(tk.Frame):
         self.wave_red_combo["values"] = wave_red_values
         self.wave_red_combo.current(0)
         self.wave_red_combo.place(x=600, y=190, anchor=tk.W)
-
-        """
-        # Wavelength Range: B1 - B7
-        self.wave_b1_radio = tk.Radiobutton(self.input_frame, text="B1", variable=self.wave_mode,
-                                            value="B1", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b1_radio.place(x=520, y=150, anchor=tk.W)
-
-        self.wave_b2_radio = tk.Radiobutton(self.input_frame, text="B2", variable=self.wave_mode,
-                                            value="B2", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b2_radio.place(x=520, y=170, anchor=tk.W)
-
-        self.wave_b3_radio = tk.Radiobutton(self.input_frame, text="B3", variable=self.wave_mode,
-                                            value="B3", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b3_radio.place(x=520, y=190, anchor=tk.W)
-
-        self.wave_b4_radio = tk.Radiobutton(self.input_frame, text="B4", variable=self.wave_mode,
-                                            value="B4", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b4_radio.place(x=520, y=210, anchor=tk.W)
-
-        self.wave_b5_radio = tk.Radiobutton(self.input_frame, text="B5", variable=self.wave_mode,
-                                            value="B5", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b5_radio.place(x=520, y=230, anchor=tk.W)
-
-        self.wave_b6_radio = tk.Radiobutton(self.input_frame, text="B6", variable=self.wave_mode,
-                                            value="B6", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b6_radio.place(x=520, y=250, anchor=tk.W)
-
-        self.wave_b7_radio = tk.Radiobutton(self.input_frame, text="B7", variable=self.wave_mode,
-                                            value="B7", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_b7_radio.place(x=520, y=270, anchor=tk.W)
-
-        # Wavelength Range: G1 - G12
-        self.wave_g1_radio = tk.Radiobutton(self.input_frame, text="G1", variable=self.wave_mode,
-                                            value="G1", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g1_radio.place(x=590, y=150, anchor=tk.W)
-
-        self.wave_g2_radio = tk.Radiobutton(self.input_frame, text="G2", variable=self.wave_mode,
-                                            value="G2", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g2_radio.place(x=590, y=170, anchor=tk.W)
-
-        self.wave_g3_radio = tk.Radiobutton(self.input_frame, text="G3", variable=self.wave_mode,
-                                            value="G3", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g3_radio.place(x=590, y=190, anchor=tk.W)
-
-        self.wave_g4_radio = tk.Radiobutton(self.input_frame, text="G4", variable=self.wave_mode,
-                                            value="G4", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g4_radio.place(x=590, y=210, anchor=tk.W)
-
-        self.wave_g5_radio = tk.Radiobutton(self.input_frame, text="G5", variable=self.wave_mode,
-                                            value="G5", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g5_radio.place(x=590, y=230, anchor=tk.W)
-
-        self.wave_g6_radio = tk.Radiobutton(self.input_frame, text="G6", variable=self.wave_mode,
-                                            value="G6", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g6_radio.place(x=590, y=250, anchor=tk.W)
-
-        self.wave_g7_radio = tk.Radiobutton(self.input_frame, text="G7", variable=self.wave_mode,
-                                            value="G7", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g7_radio.place(x=590, y=270, anchor=tk.W)
-
-        self.wave_g8_radio = tk.Radiobutton(self.input_frame, text="G8", variable=self.wave_mode,
-                                            value="G8", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g8_radio.place(x=590, y=290, anchor=tk.W)
-
-        self.wave_g9_radio = tk.Radiobutton(self.input_frame, text="G9", variable=self.wave_mode,
-                                            value="G9", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g9_radio.place(x=590, y=310, anchor=tk.W)
-
-        self.wave_g10_radio = tk.Radiobutton(self.input_frame, text="G10", variable=self.wave_mode,
-                                             value="G10", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g10_radio.place(x=590, y=330, anchor=tk.W)
-
-        self.wave_g11_radio = tk.Radiobutton(self.input_frame, text="G11", variable=self.wave_mode,
-                                             value="G110", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g11_radio.place(x=590, y=350, anchor=tk.W)
-
-        self.wave_g12_radio = tk.Radiobutton(self.input_frame, text="G12", variable=self.wave_mode,
-                                             value="G12", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_g12_radio.place(x=590, y=370, anchor=tk.W)
-
-        # Wavelength Range: R1 - R9
-        self.wave_r1_radio = tk.Radiobutton(self.input_frame, text="R1", variable=self.wave_mode,
-                                            value="R1", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r1_radio.place(x=660, y=150, anchor=tk.W)
-
-        self.wave_r2_radio = tk.Radiobutton(self.input_frame, text="R2", variable=self.wave_mode,
-                                            value="R2", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r2_radio.place(x=660, y=170, anchor=tk.W)
-
-        self.wave_r3_radio = tk.Radiobutton(self.input_frame, text="R3", variable=self.wave_mode,
-                                            value="R3", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r3_radio.place(x=660, y=190, anchor=tk.W)
-
-        self.wave_r4_radio = tk.Radiobutton(self.input_frame, text="R4", variable=self.wave_mode,
-                                            value="R4", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r4_radio.place(x=660, y=210, anchor=tk.W)
-
-        self.wave_r5_radio = tk.Radiobutton(self.input_frame, text="R5", variable=self.wave_mode,
-                                            value="R5", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r5_radio.place(x=660, y=230, anchor=tk.W)
-
-        self.wave_r6_radio = tk.Radiobutton(self.input_frame, text="R6", variable=self.wave_mode,
-                                            value="R6", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r6_radio.place(x=660, y=250, anchor=tk.W)
-
-        self.wave_r7_radio = tk.Radiobutton(self.input_frame, text="R7", variable=self.wave_mode,
-                                            value="R7", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r7_radio.place(x=660, y=270, anchor=tk.W)
-
-        self.wave_r8_radio = tk.Radiobutton(self.input_frame, text="R8", variable=self.wave_mode,
-                                            value="R8", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r8_radio.place(x=660, y=290, anchor=tk.W)
-
-        self.wave_r9_radio = tk.Radiobutton(self.input_frame, text="R9", variable=self.wave_mode,
-                                            value="R9", command=self.ui_wave_enable, font=self.font, bg=ini.c2)
-        self.wave_r9_radio.place(x=660, y=310, anchor=tk.W)
-        """
 
         # Run & Save
         self.execute_window = tk.PanedWindow(self.master, orient="vertical")
@@ -507,51 +385,18 @@ class MainGUI(tk.Frame):
 
         if status == 'normal':
             if self.resolution.get() != "LR":
-                self.wave_nir_radio.config(state='disable')
+                self.wave_nir_radio.config(state='disabled')
             else:
                 self.wave_nir_radio.config(state=status)
 
             if self.wave_mode.get() != "Input Wave":
-                self.min_wave_entry.config(state='disable')
-                self.max_wave_entry.config(state='disable')
+                self.min_wave_entry.config(state='disabled')
+                self.max_wave_entry.config(state='disabled')
 
     def ui_wave_add(self, status):  # add 20210617 by T-G. Ji
         self.wave_blue_combo.config(state=status)
         self.wave_green_combo.config(state=status)
         self.wave_red_combo.config(state=status)
-
-        """
-        self.wave_b1_radio.config(state=status)
-        self.wave_b2_radio.config(state=status)
-        self.wave_b3_radio.config(state=status)
-        self.wave_b4_radio.config(state=status)
-        self.wave_b5_radio.config(state=status)
-        self.wave_b6_radio.config(state=status)
-        self.wave_b7_radio.config(state=status)
-
-        self.wave_g1_radio.config(state=status)
-        self.wave_g2_radio.config(state=status)
-        self.wave_g3_radio.config(state=status)
-        self.wave_g4_radio.config(state=status)
-        self.wave_g5_radio.config(state=status)
-        self.wave_g6_radio.config(state=status)
-        self.wave_g7_radio.config(state=status)
-        self.wave_g8_radio.config(state=status)
-        self.wave_g9_radio.config(state=status)
-        self.wave_g10_radio.config(state=status)
-        self.wave_g11_radio.config(state=status)
-        self.wave_g12_radio.config(state=status)
-
-        self.wave_r1_radio.config(state=status)
-        self.wave_r2_radio.config(state=status)
-        self.wave_r3_radio.config(state=status)
-        self.wave_r4_radio.config(state=status)
-        self.wave_r5_radio.config(state=status)
-        self.wave_r6_radio.config(state=status)
-        self.wave_r7_radio.config(state=status)
-        self.wave_r8_radio.config(state=status)
-        self.wave_r9_radio.config(state=status)
-        """
 
     def ui_enable(self):  # add 20210324 by T-G. Ji
 
@@ -595,7 +440,7 @@ class MainGUI(tk.Frame):
             self.ui_sky_brightness('disable')
             self.ui_wave_range('normal')
             self.ui_mag_range('disable')
-            self.set_wave_entry.config(state='disable')
+            self.set_wave_entry.config(state='disabled')
 
             if self.resolution.get() == "HR":
                 self.ui_wave_add('normal')
@@ -608,11 +453,9 @@ class MainGUI(tk.Frame):
             self.max_wave_entry.config(state='normal')
 
         else:
-            self.min_wave_entry.config(state='disable')
-            self.max_wave_entry.config(state='disable')
+            self.min_wave_entry.config(state='disabled')
+            self.max_wave_entry.config(state='disabled')
 
-
-    # change 20210324 by T-G. Ji
     def run(self):
         res_mode = self.resolution.get()
         wave_mode = self.wave_mode.get()
@@ -678,7 +521,13 @@ class MainGUI(tk.Frame):
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
-                
+                    if self.min_wave < 360 or self.max_wave > 1800:
+                        print('Input wavelength must be from 360 to 1800 in LR mode.')
+                        return
+
+                print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                      '(elapsed time for few seconds ~ 2 minutes)')
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
@@ -701,50 +550,30 @@ class MainGUI(tk.Frame):
                     self.min_wave = WAVE_BAND_MR[2][0]
                     self.max_wave = WAVE_BAND_MR[2][1]
 
-
-                #elif wave_mode == "NIR":
-                    #self.mag = float(self.mag_nir_entry.get())
-                    #self.sky = float(self.sky_nir_entry.get())
-                    #self.min_wave = WAVE_BAND_MR[3][0]
-                    #self.max_wave = WAVE_BAND_MR[3][1]
-
-
                 else:
                     self.mag = float(self.mag_wave_entry.get())
                     self.sky = float(self.sky_wave_entry.get())
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
+                    if self.min_wave < 391 or self.max_wave > 900:
+                        print('Input wavelength must be from 391 to 900 in MR mode.')
+                        return
+
+                print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                      '(elapsed time for few seconds ~ 1 minutes)')
+
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
 
             elif res_mode == "HR":
                 if wave_mode == "Blue":
-                    #if wave_blue_mode == "Blue":
-                    #    self.mag = float(self.mag_blue_entry.get())
-                    #    self.sky = float(self.sky_blue_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[0][0]
-                    #    self.max_wave = WAVE_BAND_HR[0][1]
-                    #else:
                     wave_mode = wave_blue_mode
 
                 elif wave_mode == "Green":
-                    #if wave_green_mode == "Green":
-                    #    self.mag = float(self.mag_green_entry.get())
-                    #    self.sky = float(self.sky_green_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[1][0]
-                    #    self.max_wave = WAVE_BAND_HR[1][1]
-
-                    #else:
                     wave_mode = wave_green_mode
 
                 elif wave_mode == "Red":
-                    #if wave_red_mode == "Red":
-                    #    self.mag = float(self.mag_red_entry.get())
-                    #    self.sky = float(self.sky_red_entry.get())
-                    #    self.min_wave = WAVE_BAND_HR[2][0]
-                    #    self.max_wave = WAVE_BAND_HR[2][1]
-                    #else:
                     wave_mode = wave_red_mode
 
                 elif wave_mode == "Input Wave":
@@ -753,7 +582,12 @@ class MainGUI(tk.Frame):
                     self.min_wave = float(self.min_wave_entry.get())
                     self.max_wave = float(self.max_wave_entry.get())
 
-                if (wave_mode != "Blue") and (wave_mode != "Green") and (wave_mode != "Red") and (wave_mode != "Input Wave"):
+                    if self.min_wave < 360 or self.max_wave > 900:
+                        print('Input wavelength must be from 360 to 900 in HR mode.')
+                        return
+
+                if (wave_mode != "Blue") and (wave_mode != "Green") and (wave_mode != "Red") \
+                        and (wave_mode != "Input Wave"):
                     self.mag = float(self.mag_blue_entry.get())
                     self.sky = float(self.sky_blue_entry.get())
 
@@ -771,12 +605,15 @@ class MainGUI(tk.Frame):
 
                             break
 
-                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
-                                                 self.min_wave, self.max_wave)
+                    print('...... Please wait. S/N vs. Wavelength calculation is in progress. '
+                          '(elapsed time for few seconds ~ 1 minutes)')
+
+                    self.func.plot_sn_wave_order(res_mode, wave_mode, order, airmass, pwv, exp_t, exp_n, self.mag,
+                                                 self.sky, self.min_wave, self.max_wave)
                     return None
 
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
-                                   self.min_wave, self.max_wave)
+                                       self.min_wave, self.max_wave)
 
         else:
             return None
