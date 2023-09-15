@@ -13,7 +13,9 @@ h = 6.67259E-34          # Plank constant [J s]
 # ==== Instruments Parameters
 D_TEL = 10.14            # Telescope diameter [m]
 A_TEL = pi*(D_TEL/2)**2  # Light collecting area [m2]
-S_ZM = 10**(-56.1/2.5)   # Definition of AB mag [W m-2 Hz-2]
+D_FIBER = 1              # Diameter of a fiber [arcsec]
+S_ZM = 10**(-56.1/2.5)   # Definition of AB mag [W m-2 Hz-1]
+OMEGA = (pi*(D_FIBER/(2*206265))**2)*(206265)**2   # Solid angle of a fiber [arcsec2]
 N_RES = 16               # Pixel
 N_DARK = 0.02            # Dark current [e s-1 pix-1]
 

@@ -10,6 +10,7 @@ Modification Log:
     * 2021.06.03 - Version 1.1.0 was updated by Hojae Ahn
     * 2021.06.17 - Version 1.2.0 was updated by Tae-Geun Ji
     * 2021.08.04 - Version 1.2.1 was updated by Changgon Kim
+    * 2023.06.22 - Version 1.3.0 was updated by Tae-Geun Ji
 """
 
 from tkinter import Tk

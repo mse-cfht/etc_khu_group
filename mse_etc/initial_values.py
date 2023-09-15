@@ -7,6 +7,7 @@ Modification Log:
     * 2021.06.03 - Updated by Hojae Ahn
     * 2021.06.17 - Updated by Tae-Geun Ji
     * 2021.09.06 - Updated by Changgon Kim
+    * 2023.06.14 - Updated by Tae-Geun Ji
 """
 
 # Colors
@@ -18,9 +19,9 @@ c4 = "black"
 
 # Titles
 etc_title = "MSE Exposure Time Calculator"
-etc_version = "v1.2.4"
-etc_date = "20211006"
-etc_editor = "TK"
+etc_version = "v1.3.0"
+etc_date = "20230622"
+etc_editor = "TJ"
 
 # Gui parameters
 airmass = 1
@@ -33,4 +34,4 @@ max_mag = 26.0
 wave = 482
 sky = [20.7, 20.7, 20.7, 20.7, 20.7]
 min_wave = 360
-max_wave = 1320
+max_wave = 1800

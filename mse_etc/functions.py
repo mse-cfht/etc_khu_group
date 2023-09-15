@@ -12,6 +12,7 @@ Modification Log:
     * 2021.06.17 - Updated by Tae-Geun Ji
     * 2021.08.04 - Updated by Changgon Kim
     * 2021.09.06 - Updated by Changgon Kim
+    * 2023.06.13 - Updated by Tae-Geun Ji
 """
 
 from math import sqrt
@@ -57,6 +58,8 @@ class Functions:
         self.tau_ie = []
         self.tau = []
 
+        self.tel_data = []
+
         self.wave_order1 = []
         self.wave_order2 = []
         self.snr_order1 = []
@@ -79,6 +82,8 @@ class Functions:
         self.n_read = np.zeros(index)
 
         self.sky_bg = np.zeros(index)
+        self.sky_bg_te = np.zeros(index)
+        self.tel_data = np.zeros(index)
         self.signal = np.zeros(index)
         self.noise = np.zeros(index)
         self.snr = np.zeros(index)
@@ -188,20 +193,28 @@ class Functions:
 
         for i in range(index):
             if res_mode == "LR":
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(i, airmass, pwv, self.wave[i])
+                if BAND_LR[i] == "NIR":
+                    self.tel_data[i] = self.tau_func.telluric_emission(self.wave[i])
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(BAND_LR[i], airmass, pwv, self.wave[i])
             elif res_mode == "MR":
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(i, airmass, pwv, self.wave[i])
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(BAND_MR[i], airmass, pwv, self.wave[i])
             elif res_mode == "HR":
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(i, airmass, pwv, self.wave[i])
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(BAND_HR[i], airmass, pwv, self.wave[i])
 
             self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave[i])
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
         for i in range(index):
-            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
             self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * mag[i]) / (h * self.res[i])
-            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[i] ** 2))
+            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA \
+                             * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
+            if res_mode == "LR":
+                if BAND_LR[i] == "NIR":
+                    self.sky_bg_te[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA * self.tel_data[i]
+                else:
+                    self.sky_bg_te[i] = 0.0
+            self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[i] ** 2))
             self.snr[i] = self.signal[i] / self.noise[i]
 
         if print_text is True:
@@ -325,10 +338,12 @@ class Functions:
         self.n_read = np.zeros(index)
 
         self.sky_bg = np.zeros(index)
+        self.sky_bg_te = np.zeros(index)
         self.signal = np.zeros(index)
         self.noise = np.zeros(index)
         self.snr = np.zeros(index)
 
+        self.tel_data = np.zeros(index)
         self.tau_atmo = np.zeros(index)
         self.tau_opt = np.zeros(index)
         self.tau_ie = np.zeros(index)
@@ -338,10 +353,24 @@ class Functions:
             self.num = len(CTR_LR)
 
             for i in range(self.num):
+
+                band = "0"
+                if i == 0:
+                    band = "Blue"
+                elif i == 1:
+                    band = "Green"
+                elif i == 2:
+                    band = "Red"
+                elif i == 3:
+                    band = "NIR"
+                else:
+                    pass
+
                 self.res[i] = RES_LR[i]
                 self.wave[i] = CTR_LR[i]
                 self.n_read[i] = N_READ_LR[i]
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(i, airmass, pwv, self.wave[i])
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(band, airmass, pwv, self.wave[i])
+                self.tel_data[i] = self.tau_func.telluric_emission(self.wave[i])
 
         elif res_mode == "MR":
             self.num = len(CTR_MR)
@@ -350,7 +379,18 @@ class Functions:
                 self.res[i] = RES_MR[i]
                 self.wave[i] = CTR_MR[i]
                 self.n_read[i] = N_READ_MR[i]
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(i, airmass, pwv, self.wave[i])
+
+                band = "0"
+                if i == 0:
+                    band = "Blue"
+                elif i == 1:
+                    band = "Green"
+                elif i == 2:
+                    band = "Red"
+                else:
+                    pass
+
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(band, airmass, pwv, self.wave[i])
 
         elif res_mode == "HR":
             self.num = len(CTR_HR)
@@ -359,7 +399,18 @@ class Functions:
                 self.res[i] = RES_HR[i]
                 self.wave[i] = CTR_HR[i]
                 self.n_read[i] = N_READ_HR[i]
-                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(i, airmass, pwv, self.wave[i])
+
+                band = "0"
+                if i == 0:
+                    band = "Blue"
+                elif i == 1:
+                    band = "Green"
+                elif i == 2:
+                    band = "Red"
+                else:
+                    pass
+
+                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(band, airmass, pwv, self.wave[i])
 
         for i in range(self.num):
             self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
@@ -367,7 +418,10 @@ class Functions:
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
         for i in range(self.num):
-            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
+            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * OMEGA * self.tau_opt[i] * self.tau_atmo[i] \
+                             * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
+            if res_mode == "LR":
+                self.sky_bg_te[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA * self.tel_data[i]
 
         for i in range(nlen):
             signal_blue[i] = (exp_t * exp_n) * A_TEL * self.tau[0] * S_ZM \
@@ -381,12 +435,12 @@ class Functions:
                 signal_nir[i] = (exp_t * exp_n) * A_TEL * self.tau[3] * S_ZM \
                                 * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[3])
 
-            noise_blue[i] = sqrt(signal_blue[i] + self.sky_bg[0] + N_RES * (exp_t * N_DARK + self.n_read[0]**2))
-            noise_green[i] = sqrt(signal_green[i] + self.sky_bg[1] + N_RES * (exp_t * N_DARK + self.n_read[1]**2))
-            noise_red[i] = sqrt(signal_red[i] + self.sky_bg[2] + N_RES * (exp_t * N_DARK + self.n_read[2]**2))
+            noise_blue[i] = sqrt(signal_blue[i] + self.sky_bg[0] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[0]**2))
+            noise_green[i] = sqrt(signal_green[i] + self.sky_bg[1] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[1]**2))
+            noise_red[i] = sqrt(signal_red[i] + self.sky_bg[2] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[2]**2))
 
-            if res_mode != "HR":
-                noise_nir[i] = sqrt(signal_nir[i] + self.sky_bg[3] + N_RES * (exp_t * N_DARK + self.n_read[3]**2))
+            if res_mode == "LR":
+                noise_nir[i] = sqrt(signal_nir[i] + self.sky_bg[3] + self.sky_bg_te[3] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[3]**2))
 
             result_blue[i] = signal_blue[i] / noise_blue[i]
             result_green[i] = signal_green[i] / noise_green[i]
@@ -423,20 +477,9 @@ class Functions:
         k = 0  # band index
 
         if res_mode == "LR":
-            if wave_mode == "Blue":
-                k = 0
-            elif wave_mode == "Green":
-                k = 1
-            elif wave_mode == "Red":
-                k = 2
-            elif wave_mode == "NIR":
-                k = 3
-            else:
-                pass
-
             if wave_mode != "Input Wave":
                 for i in range(num):
-                    self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
+                    self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(wave_mode, airmass, pwv, self.wave_grid[i])
                     self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
                     self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                     self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
@@ -444,14 +487,14 @@ class Functions:
                 #added by CK 20210903
                 for i in range(num):
                     tel_data = self.tau_func.telluric_emission(self.wave_grid[i])
-                    self.sky_bg_te[i] = exp_t * exp_n * A_TEL * self.tau[i] * tel_data * (206265 ** 2) 
+                    self.sky_bg_te[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA * tel_data
                 
                 for i in range(num):
+                    self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM * 10.0 ** (-0.4 * mag) \
+                                     / (h * RES_LR[k])
                     # remove tau ie for the background -> 
-                    self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
-                    self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                     * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
+                    self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA \
+                                     * S_ZM * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
                                     
                     self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_LR[k] ** 2))
                     self.snr[0][i] = self.signal[i] / self.noise[i]
@@ -461,7 +504,6 @@ class Functions:
 
             else:
                 index = [0, 0, 0, 0]
-                #index = [0, 0, 0]
 
                 for k in range(4):
                     count = 0
@@ -483,20 +525,33 @@ class Functions:
                 self.wave_red = np.zeros(index[2])
                 self.wave_nir = np.zeros(index[3])
 
-
                 for k in range(4):
                     count = 0
                     for i in range(num):
                         if WAVE_BAND_LR[k][0] <= self.wave_grid[i] <= WAVE_BAND_LR[k][1]:
-                            self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(k, airmass, pwv, self.wave_grid[i])
+
+                            band = "0"
+                            if k == 0:
+                                band = "Blue"
+                            elif k == 1:
+                                band = "Green"
+                            elif k == 2:
+                                band = "Red"
+                            elif k == 3:
+                                band = "NIR"
+                            else:
+                                pass
+
+                            self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(band, airmass, pwv, self.wave_grid[i])
+
                             self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
                             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
                             tel_data = self.tau_func.telluric_emission(self.wave_grid[i])
-                            self.sky_bg_te[i] = exp_t * exp_n * A_TEL * self.tau[i] * tel_data * (206265 ** 2)
+                            self.sky_bg_te[i] = exp_t * exp_n * A_TEL * self.tau_atmo[i] * self.tau_opt[i] * OMEGA * tel_data
 
-                            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
+                            self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau_atmo[i] * self.tau_opt[i] * OMEGA * S_ZM \
                                              * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
                             self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
                                              * 10.0 ** (-0.4 * mag) / (h * RES_LR[k])
@@ -525,22 +580,11 @@ class Functions:
                                        min_wave, max_wave, snr_arr, wave_arr)
 
         elif res_mode == "MR":
-            if wave_mode == "Blue":
-                k = 0
-            elif wave_mode == "Green":
-                k = 1
-            elif wave_mode == "Red":
-                k = 2
-            elif wave_mode == "NIR":
-                k = 3
-            else:
-                pass
-
             if wave_mode != "Input Wave":
                 with_grating = 0
                 while with_grating <= 1:
                     for i in range(num):
-                        self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
+                        self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(wave_mode, airmass, pwv, self.wave_grid[i])
                         self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
                         self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                         self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
@@ -589,7 +633,20 @@ class Functions:
                         count = 0
                         for i in range(num):
                             if WAVE_BAND_MR[k][0] <= self.wave_grid[i] <= WAVE_BAND_MR[k][1]:
-                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(k, airmass, pwv, self.wave_grid[i])
+
+                                band = "0"
+                                if k == 0:
+                                    band = "Blue"
+                                elif k == 1:
+                                    band = "Green"
+                                elif k == 2:
+                                    band = "Red"
+                                elif k == 3:
+                                    band = "NIR"
+                                else:
+                                    pass
+
+                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_MR(band, airmass, pwv, self.wave_grid[i])
                                 self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
                                 self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                                 self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
@@ -636,29 +693,6 @@ class Functions:
 
             if wave_mode != "Input Wave":
                 pass
-                """
-                with_grating = 0
-                while with_grating <= 1:
-                    for i in range(num):
-                        self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
-                        self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
-                        self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
-                        self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
-
-                    for i in range(num):
-                        self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                         * 10.0 ** (-0.4 * sky) / (h * RES_HR[k])
-                        self.signal[i] = (exp_t * exp_n) * A_TEL * self.tau[i] * S_ZM \
-                                         * 10.0 ** (-0.4 * mag) / (h * RES_HR[k])
-                        self.noise[i] = sqrt(
-                            self.signal[i] + self.sky_bg[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_HR[k] ** 2))
-                        self.snr[with_grating][i] = self.signal[i] / self.noise[i]
-
-                    with_grating += 1
-
-                output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
-                                       min_wave, max_wave, self.snr, self.wave_grid)
-                """
             else:
                 index = [0, 0, 0]
 
@@ -688,7 +722,20 @@ class Functions:
                         count = 0
                         for i in range(num):
                             if WAVE_BAND_HR[k][0] <= self.wave_grid[i] <= WAVE_BAND_HR[k][1]:
-                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(k, airmass, pwv, self.wave_grid[i])
+
+                                band = "0"
+                                if k == 0:
+                                    band = "Blue"
+                                elif k == 1:
+                                    band = "Green"
+                                elif k == 2:
+                                    band = "Red"
+                                elif k == 3:
+                                    band = "NIR"
+                                else:
+                                    pass
+
+                                self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(band, airmass, pwv, self.wave_grid[i])
                                 self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], with_grating)
                                 self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                                 self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
