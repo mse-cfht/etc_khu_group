@@ -18,7 +18,7 @@ Modification Log:
 from math import sqrt
 
 import numpy as np
-
+import time
 import interpolate
 import output
 from parameters import *
@@ -201,7 +201,7 @@ class Functions:
             elif res_mode == "HR":
                 self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(BAND_HR[i], airmass, pwv, self.wave[i])
 
-            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
+            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], False)
             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave[i])
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -223,6 +223,7 @@ class Functions:
         return self.snr  # add 210408 hojae
 
     def cal_exp_time(self, res_mode, airmass, pwv, target_sn, mag, sky, input_wave):  # add 210408 hojae
+
         self.exp_table = np.zeros(len(mag))
         self.sn_table = []
 
@@ -318,13 +319,25 @@ class Functions:
         noise_blue = np.zeros(nlen)
         result_blue = np.zeros(nlen)
 
+        signal_blue_grating = np.zeros(nlen)
+        noise_blue_grating = np.zeros(nlen)
+        result_blue_grating = np.zeros(nlen)
+
         signal_green = np.zeros(nlen)
         noise_green = np.zeros(nlen)
         result_green = np.zeros(nlen)
 
+        signal_green_grating = np.zeros(nlen)
+        noise_green_grating = np.zeros(nlen)
+        result_green_grating = np.zeros(nlen)
+
         signal_red = np.zeros(nlen)
         noise_red = np.zeros(nlen)
         result_red = np.zeros(nlen)
+
+        signal_red_grating = np.zeros(nlen)
+        noise_red_grating = np.zeros(nlen)
+        result_red_grating = np.zeros(nlen)
 
         signal_nir = np.zeros(nlen)
         noise_nir = np.zeros(nlen)
@@ -338,6 +351,7 @@ class Functions:
         self.n_read = np.zeros(index)
 
         self.sky_bg = np.zeros(index)
+        self.sky_bg_grating = np.zeros(index)
         self.sky_bg_te = np.zeros(index)
         self.signal = np.zeros(index)
         self.noise = np.zeros(index)
@@ -346,8 +360,10 @@ class Functions:
         self.tel_data = np.zeros(index)
         self.tau_atmo = np.zeros(index)
         self.tau_opt = np.zeros(index)
+        self.tau_opt_grating = np.zeros(index)
         self.tau_ie = np.zeros(index)
         self.tau = np.zeros(index)
+        self.tau_grating = np.zeros(index)
 
         if res_mode == "LR":
             self.num = len(CTR_LR)
@@ -413,13 +429,20 @@ class Functions:
                 self.tau_atmo[i] = self.tau_func.get_tau_atmo_HR(band, airmass, pwv, self.wave[i])
 
         for i in range(self.num):
-            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], True)
+            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave[i], False)
             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave[i])
             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
+
+            if res_mode == "MR" or res_mode == "HR":
+                self.tau_opt_grating[i] = self.tau_func.tau_opt_res(self.wave[i], True)
+                self.tau_grating[i] = self.tau_atmo[i] * self.tau_opt_grating[i] * self.tau_ie[i]
 
         for i in range(self.num):
             self.sky_bg[i] = (exp_t * exp_n) * A_TEL * OMEGA * self.tau_opt[i] * self.tau_atmo[i] \
                              * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
+            if res_mode == "MR" or res_mode == "HR":
+                self.sky_bg_grating[i] = (exp_t * exp_n) * A_TEL * OMEGA * self.tau_opt_grating[i] * self.tau_atmo[i] \
+                                         * S_ZM * 10.0 ** (-0.4 * sky[i]) / (h * self.res[i])
             if res_mode == "LR":
                 self.sky_bg_te[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA * self.tel_data[i]
 
@@ -431,6 +454,14 @@ class Functions:
             signal_red[i] = (exp_t * exp_n) * A_TEL * self.tau[2] * S_ZM \
                             * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[2])
 
+            if res_mode == "MR" or res_mode == "HR":
+                signal_blue_grating[i] = (exp_t * exp_n) * A_TEL * self.tau_grating[0] * S_ZM \
+                                         * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[0])
+                signal_green_grating[i] = (exp_t * exp_n) * A_TEL * self.tau_grating[1] * S_ZM \
+                                          * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[1])
+                signal_red_grating[i] = (exp_t * exp_n) * A_TEL * self.tau_grating[2] * S_ZM \
+                                        * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[2])
+
             if res_mode == "LR":
                 signal_nir[i] = (exp_t * exp_n) * A_TEL * self.tau[3] * S_ZM \
                                 * 10.0 ** (-0.4 * mag_grid[i]) / (h * self.res[3])
@@ -439,6 +470,14 @@ class Functions:
             noise_green[i] = sqrt(signal_green[i] + self.sky_bg[1] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[1]**2))
             noise_red[i] = sqrt(signal_red[i] + self.sky_bg[2] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[2]**2))
 
+            if res_mode == "MR" or res_mode == "HR":
+                noise_blue_grating[i] = sqrt(signal_blue_grating[i] + self.sky_bg_grating[0]
+                                             + N_RES * exp_n * (exp_t * N_DARK + self.n_read[0] ** 2))
+                noise_green_grating[i] = sqrt(signal_green_grating[i] + self.sky_bg_grating[1]
+                                              + N_RES * exp_n * (exp_t * N_DARK + self.n_read[1] ** 2))
+                noise_red_grating[i] = sqrt(signal_red_grating[i] + self.sky_bg_grating[2]
+                                            + N_RES * exp_n * (exp_t * N_DARK + self.n_read[2] ** 2))
+
             if res_mode == "LR":
                 noise_nir[i] = sqrt(signal_nir[i] + self.sky_bg[3] + self.sky_bg_te[3] + N_RES * exp_n * (exp_t * N_DARK + self.n_read[3]**2))
 
@@ -446,13 +485,19 @@ class Functions:
             result_green[i] = signal_green[i] / noise_green[i]
             result_red[i] = signal_red[i] / noise_red[i]
 
+            if res_mode == "MR" or res_mode == "HR":
+                result_blue_grating[i] = signal_blue_grating[i] / noise_blue_grating[i]
+                result_green_grating[i] = signal_green_grating[i] / noise_green_grating[i]
+                result_red_grating[i] = signal_red_grating[i] / noise_red_grating[i]
+
             if res_mode == "LR":
                 result_nir[i] = signal_nir[i] / noise_nir[i]
 
         if res_mode == "LR":
             arr_result = [result_blue, result_green, result_red, result_nir]
         else:
-            arr_result = [result_blue, result_green, result_red]
+            arr_result = [result_blue, result_green, result_red,
+                          result_blue_grating, result_green_grating, result_red_grating]
 
         output.display_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, mag_grid, sky, arr_result)
 
@@ -477,10 +522,11 @@ class Functions:
         k = 0  # band index
 
         if res_mode == "LR":
+            start = time.time()
             if wave_mode != "Input Wave":
                 for i in range(num):
                     self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(wave_mode, airmass, pwv, self.wave_grid[i])
-                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
+                    self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], False)
                     self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                     self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -495,9 +541,12 @@ class Functions:
                     # remove tau ie for the background -> 
                     self.sky_bg[i] = (exp_t * exp_n) * A_TEL * self.tau_opt[i] * self.tau_atmo[i] * OMEGA \
                                      * S_ZM * 10.0 ** (-0.4 * sky) / (h * RES_LR[k])
-                                    
+
                     self.noise[i] = sqrt(self.signal[i] + self.sky_bg[i] + self.sky_bg_te[i] + N_RES * exp_n * (exp_t * N_DARK + N_READ_LR[k] ** 2))
                     self.snr[0][i] = self.signal[i] / self.noise[i]
+
+                end = time.time()
+                print(f"Processing time = {end - start:.2f} sec.")
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
                                        min_wave, max_wave, self.snr, self.wave_grid)
@@ -544,7 +593,7 @@ class Functions:
 
                             self.tau_atmo[i] = self.tau_func.get_tau_atmo_LR(band, airmass, pwv, self.wave_grid[i])
 
-                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], True)
+                            self.tau_opt[i] = self.tau_func.tau_opt_res(self.wave_grid[i], False)
                             self.tau_ie[i] = self.tau_func.tau_ie_res(self.wave_grid[i])
                             self.tau[i] = self.tau_atmo[i] * self.tau_opt[i] * self.tau_ie[i]
 
@@ -575,6 +624,9 @@ class Functions:
                 
                 wave_arr = [self.wave_blue, self.wave_green, self.wave_red, self.wave_nir]
                 snr_arr = [self.snr_blue, self.snr_green, self.snr_red, self.snr_nir]
+
+                end = time.time()
+                print(f"Processing time = {end - start:.2f} sec.")
 
                 output.display_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, mag, sky,
                                        min_wave, max_wave, snr_arr, wave_arr)

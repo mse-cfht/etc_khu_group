@@ -15,6 +15,7 @@ import tkinter.font as font
 import tkinter.ttk as ttk
 
 import numpy as np
+import time
 
 import functions
 import initial_values as ini
@@ -484,7 +485,10 @@ class MainGUI(tk.Frame):
             self.func.cal_signal_to_noise(res_mode, airmass, pwv, exp_t, exp_n, mag_arr, sky_arr, set_wave, True)
 
         elif cal_mode == "ExpTime Calculation":
+            start = time.time()
             self.func.cal_exp_time(res_mode, airmass, pwv, target_sn, mag_arr, sky_arr, set_wave)
+            end = time.time()
+            print(f"Processing time = {end-start:.2f} sec.")
 
         elif cal_mode == "S/N vs. Magnitude":
             self.func.plot_sn_mag(res_mode, airmass, pwv, exp_t, exp_n, min_mag, max_mag, sky_arr)
@@ -614,7 +618,6 @@ class MainGUI(tk.Frame):
 
                 self.func.plot_sn_wave(res_mode, wave_mode, airmass, pwv, exp_t, exp_n, self.mag, self.sky,
                                        self.min_wave, self.max_wave)
-
         else:
             return None
 
