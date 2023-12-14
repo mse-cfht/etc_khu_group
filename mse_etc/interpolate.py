@@ -194,7 +194,7 @@ class Throughput:
             self.tel_m1_zecoat_arr = data[:, 1]
             self.tel_wfc_adc_arr = data[:, 2]
             self.sip_fits_arr = data[:, 3]
-            self.sip_arr = data[:, 4]
+            self.sip_no_grating_arr = data[:, 4]
             self.data_tau_ie = data[:, 5]
 
         elif res_mode == "MR":
@@ -402,10 +402,10 @@ class Throughput:
 
         if pwv >= 1 and pwv <= 2.5:
             for i in np.arange(0, N_data):
-                y[i] = transmission1[i] + (pwv - 1) * (transmission2[i] - transmission1[i])
+                y[i] = transmission1[i] + (transmission2[i] - transmission1[i]) * ((pwv - 1.0) / (2.5 - 1.0))
         elif pwv > 2.5 and pwv <= 7.5:
             for i in np.arange(0, N_data):
-                y[i] = transmission2[i] + (pwv - 2.5) * (transmission7[i] - transmission2[i]) / (7.5 - 2.5)
+                y[i] = transmission2[i] + (transmission7[i] - transmission2[i]) * ((pwv - 2.5) / (7.5 - 2.5))
         else:
             return print("tau_atmo calculation error occurred.")
 
@@ -575,7 +575,7 @@ class Throughput:
     def get_tau_order(self, wave):  # Only consider to index for HR
         """ Returns the throughput values. """
 
-        func_tau_order = interpolate.interp1d(self.data_wave, self.data_tau, kind='cubic', fill_value="extrapolate")
+        func_tau_order = interpolate.interp1d(self.data_wave, self.data_tau, kind='linear', fill_value="extrapolate")
         result = func_tau_order(wave)
 
         return result
@@ -584,18 +584,18 @@ class Throughput:
         """ Returns the optical values. """
 
         func_tel_m1_zecoat = interpolate.interp1d(self.tau_wave, self.tel_m1_zecoat_arr,
-                                                  kind='cubic', fill_value="extrapolate")
+                                                  kind='linear', fill_value="extrapolate")
         func_tel_wfc_adc = interpolate.interp1d(self.tau_wave, self.tel_wfc_adc_arr,
-                                                kind='cubic', fill_value="extrapolate")
+                                                kind='linear', fill_value="extrapolate")
         func_sip_fits = interpolate.interp1d(self.tau_wave, self.sip_fits_arr,
-                                             kind='cubic', fill_value="extrapolate")
+                                             kind='linear', fill_value="extrapolate")
 
         if with_grating:
             func_sip = interpolate.interp1d(self.tau_wave, self.sip_arr,
-                                            kind='cubic', fill_value="extrapolate")
+                                            kind='linear', fill_value="extrapolate")
         else:
             func_sip = interpolate.interp1d(self.tau_wave, self.sip_no_grating_arr,
-                                            kind='cubic', fill_value="extrapolate")
+                                            kind='linear', fill_value="extrapolate")
 
         # LR, MR, HR has same value for ENCL, TEL_MSTR, TEL_PFHS, SIP_POSS
         self.tau_opt = ENCL_LR * TEL_MSTR_LR * func_tel_m1_zecoat(wave) * TEL_PFHS_LR \
@@ -606,7 +606,7 @@ class Throughput:
     def tau_ie_res(self, wave):
         """ Returns the injection efficiency. """
 
-        func_tau_ie = interpolate.interp1d(self.tau_wave, self.data_tau_ie, kind='cubic', fill_value="extrapolate")
+        func_tau_ie = interpolate.interp1d(self.tau_wave, self.data_tau_ie, kind='linear', fill_value="extrapolate")
         self.tau_ie = func_tau_ie(wave)
 
         return self.tau_ie

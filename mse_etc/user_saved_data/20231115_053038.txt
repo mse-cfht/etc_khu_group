@@ -1,0 +1,17 @@
+======================================================
+The calculation Signal-to-Noise vs. Magnitude
+
+Resolution Mode   = Moderate Resolution
+Airmass           = 1.0
+PWV [mm]          = 1.0
+Exposure Time [s] = 1200
+Exposure Number   = 3
+Magnitude Range [mag] : 18.00 - 26.00
+
+Band	 Sky
+[Blue]	 20.70
+[Green]	 20.70
+[Red]	 20.70
+
+========== Plot data ==========
+Point Target Magnitude[ABmag]	SNR_Blue	SNR_Green	SNR_Red	SNR_Blue(with grating)	SNR_Red(with grating)	SNR_Red(with grating)
